@@ -1,0 +1,5824 @@
+<!-- 
+
+Hecho por Roberto chalean 2018
+
+robertchalean@gmail.com
+
+buscar tamano_page;
+
+to do:
+
+agregar multiples imagenes por palabra
+carpetas especiales para textos (se configuran autmoaticamente con las primeras palabras)
+efectos de sonido e imagenes por ubicacion en el texto
+frases largas (varias palabras juntas que dan un siginificado ejemplo cumplir años, mejorar ejemplo)
+dieferenciacion de palabras con acento
+videos
+exclusion de tipos de palabras
+suporte para distintos diccionarios (idiomas , o diccionario alternativo para un idioma)
+futuro detectar concepto ejemplo pasar al lado vs pasar pelota
+analisis sintactico para mejor posicion de palabrar ej: guarda (tren) vs guarda (verbo presente)
+archivos de traduccion
+
+agregar descripcion imagen on mouse over
+agregar si se vuelve atrás se vuelve con el nombre de la palabra 4 palabras o algo asi (mostrando la palabra) con click derecho
+scriptear las imagenes especiales con acento y sin acento como "si y sí"
+
+-->
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+  <!-- <meta charset="UTF-8"> -->
+
+  <title>WIS</title>
+  <!--
+  <script src="js/react-with-addons.js"></script>
+  <script src="js/react-dom.js"></script>
+  -->
+  <script src="exclude.js"></script>
+  <script src="js/datos.js"></script>
+
+  <script src="js/jquery.min.js"></script>
+  <script src="js/underscore-min.js"></script>
+  <script src="js/dictionary2.js"></script>
+  <script src="js/antonimos.js"></script>
+ <script src="js/wiki.js"></script> 
+   <script src="js/waud.min.js"></script>
+
+  <script src="js/howler.core.min.js"></script>
+  <script src="js/howler.spatial.min.js"></script>
+
+  <!-- <script src="js/midi/Base64binary.js" type="text/javascript"></script> -->
+
+  <!--
+  <script src="js/midi/Base64binary.js" type="text/javascript"></script> 
+  <script src="js/midi/WebAudioAPI.js" type="text/javascript"></script>
+  
+  <script src="js/midi/audioDetect.js" type="text/javascript"></script>
+  <script src="js/midi/gm.js" type="text/javascript"></script>
+  <script src="js/midi/loader.js" type="text/javascript"></script>
+  <script src="js/midi/plugin.audiotag.js" type="text/javascript"></script>
+  <script src="js/midi/plugin.webaudio.js" type="text/javascript"></script>
+  <script src="js/midi/plugin.webmidi.js" type="text/javascript"></script>
+
+  -->
+  
+ <!-- <script src="js/midi/dom_request_xhr.js" type="text/javascript"></script> -->
+ <!-- <script src="js/midi/dom_request_script.js" type="text/javascript"></script> -->
+
+  <!--<script src="js/gif.js?v=3"></script>-->
+  
+  <script src="js/platform.js"></script>
+  <link rel="import" href="x-gif.html">
+ 
+  <style type="text/css">
+
+  video::cue { visibility: hidden; }
+
+   .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #f9f9f9;
+            min-width: 160px;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            padding: 12px 16px;
+           
+        }
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+
+  .anim {
+    white-space: nowrap;
+  }
+
+  .anim > span {
+    /* width: 300px; */
+    display: inline-block;
+  }
+
+  /*no animation*/
+
+  @keyframes example15 {
+     
+     0%   {zoom: 1.5;  }
+    
+     100%   {zoom: 1.5;  }
+
+  }
+
+  @keyframes example {
+    /*
+    from {zoom: 0.5;}
+    to {zoom: 2.25;}*/
+
+    /*
+     0%   {zoom: 0.7; }
+     25%   {zoom: 1; }
+     50%   {zoom: 1.35; }
+     75%   {zoom: 1.8;  }
+     100%   {zoom: 2.6;  }*/
+
+
+     
+     0%   {zoom: 0.75; transform: skewY(30deg);  -webkit-filter: blur(8px); }
+     12%   {zoom: 0.75; /*transform: skewY(30deg);*/ }
+     25%   {zoom: 1;  transform: skewY(15deg);  }
+     50%   {zoom: 1.5;  transform: skewY(0deg);  -webkit-filter: blur(4px); }
+     63%   {zoom: 1.65;  /*transform: skewY(0deg);*/}
+     75%   {zoom: 1.85;  transform: skewY(-15deg);  -webkit-filter: blur(0px); }
+     100%   {zoom: 2.75; transform: skewY(-30deg); }
+
+  }
+  /* zoom in light */ 
+   @keyframes example16 {
+     
+     0%   {zoom: 0.5;  }
+     12%   {zoom: 0.75;  }
+     25%   {zoom: 1;  }
+     50%   {zoom: 1.5; }
+     63%   {zoom: 1.65; }
+     75%   {zoom: 1.85; }
+     100%   {zoom: 2;  }
+
+  }
+
+  @keyframes example3 {
+     
+     0%   {zoom: 0.5;  }
+     12%   {zoom: 0.75;  }
+     25%   {zoom: 1;  }
+     50%   {zoom: 1.5; }
+     63%   {zoom: 1.65; }
+     75%   {zoom: 1.85; }
+     100%   {zoom: 2.75;  }
+
+  }
+  /* skew multi image */
+  @keyframes example4 {
+     
+     0%   {zoom: 0.75; skewY(30deg); -webkit-filter: blur(8px);}
+     25%   {zoom: 1; skewY(15deg); }
+     50%   {zoom: 1.2; skewY(0deg); -webkit-filter: blur(4px); }
+     75%   {zoom: 1.4; skewY(-15deg); -webkit-filter: blur(0px); }
+     100%   {zoom: 1.8; skewY(-30deg); }
+
+  }
+  /* multi image no skew*/
+    @keyframes example7 {
+     
+     0%   {zoom: 0.75;  }
+     25%   {zoom: 1;  }
+     50%   {zoom: 1.2; }
+     75%   {zoom: 1.4; }
+     100%   {zoom: 1.8;  }
+
+  }
+
+  @keyframes example1 {
+   /*
+     
+     0%   {zoom: 0.75; transform: skewY(30deg); }
+     25%   {zoom: 1;  transform: skewY(15deg); }
+     50%   {zoom: 1.4;  transform: skewY(0deg);}
+     75%   {zoom: 1.8;  transform: skewY(-15deg);}
+     100%   {zoom: 2; transform: skewY(-30deg); }
+*/
+  }
+    /*zoom out */
+    @keyframes example5 {
+     
+     0%   {zoom: 2.75;  }
+     12%   {zoom: 2.6;  }
+     25%   {zoom: 1.85;  }
+     50%   {zoom: 1.65; }
+     63%   {zoom: 1.3; }
+     75%   {zoom: 1.2; }
+     100%   {zoom: 0.65;  }
+
+  }
+
+   @keyframes example6 {
+     
+     0%   {zoom: 1.8;  }
+     25%   {zoom: 1.4;  }
+     50%   {zoom: 1.2; }
+     75%   {zoom: 1; }
+     100%   {zoom: 0.75;  }
+
+  }
+
+
+  /*oly blur*/
+   @keyframes example8 {
+     
+     0%   {zoom: 2;  -webkit-filter: blur(8px);}
+     25%   {-webkit-filter: blur(6px);  }
+     50%   {-webkit-filter: blur(4px); }
+     75%   {-webkit-filter: blur(0px); }
+     100%   {zoom: 2; -webkit-filter: blur(0px); }
+
+  }
+
+   @keyframes example9 {
+     
+     0%   {zoom: 1.2;  -webkit-filter: blur(8px);}
+     25%   {-webkit-filter: blur(6px);  }
+     50%   {-webkit-filter: blur(4px); }
+     75%   {-webkit-filter: blur(0px); }
+     100%   {zoom: 1.2; -webkit-filter: blur(0px); }
+
+  }
+
+/* k>0 */
+  @keyframes example10 {
+     
+     0%   {zoom: 1;  -webkit-filter: blur(8px);}
+     25%   {-webkit-filter: blur(6px);  }
+     50%   {-webkit-filter: blur(4px); }
+     75%   {-webkit-filter: blur(0px); }
+     100%   {zoom: 1; -webkit-filter: blur(0px); }
+
+  }
+
+  /*Only Angle*/
+
+  @keyframes example11 {
+
+
+
+     
+     0%   {zoom: 0.75; transform: skewY(30deg);   }
+     12%   {zoom: 0.75; /*transform: skewY(30deg);*/ }
+     25%   {zoom: 1;  transform: skewY(15deg);  }
+     50%   {zoom: 1.5;  transform: skewY(0deg);  }
+     63%   {zoom: 1.65;  /*transform: skewY(0deg);*/}
+     75%   {zoom: 1.85;  transform: skewY(-15deg); }
+     100%   {zoom: 2.75; transform: skewY(-30deg); }
+
+  }
+
+
+    /*only angle multi*/
+    @keyframes example12 {
+   
+     
+     0%   {zoom: 0.75; transform: skewY(30deg);   }
+     12%   {zoom: 0.85; /*transform: skewY(30deg);*/ }
+     25%   {zoom: 0.9;  transform: skewY(15deg);  }
+     50%   {zoom: 1.0;  transform: skewY(0deg);  }
+     63%   {zoom: 1.1;  /*transform: skewY(0deg);*/}
+     75%   {zoom: 1.2;  transform: skewY(-15deg); }
+     100%   {zoom: 1.5; transform: skewY(-30deg); }
+
+  }
+
+  /*inverse*/
+  @keyframes example13 {
+
+
+    /* $("img").css("transform", "scaleY("+x+")")*/
+
+
+     /*
+     0%   { transform: scaleY(-1); }
+     12%   {  }
+     30%   { transform: scaleY(1);  }
+     50%   {   }
+     63%   {  }
+     75%   {  }
+     100%   { transform: scaleY(1); }*/
+
+
+
+  }
+
+    /*only angle multi*/
+    @keyframes example14 {
+   
+     
+     0%   {zoom: 2; -webkit-filter:  }
+     12%   {zoom: 1.75;  }
+     25%   {zoom: 1.5;   }
+     50%   {zoom: 1.25;  }
+     63%   {zoom: 1; }
+     75%   {zoom: 0.75;   }
+     100%   {zoom: 0.5; }
+
+  }
+
+   @keyframes example15 {
+   
+   /* $("img").css("-webkit-filter", "grayscale(0%)"); }else{ $("img").css("-webkit-filter", "grayscale(100%)"); } */
+     
+     0%   { -webkit-filter: grayscale(100%); }
+  
+     50%   { -webkit-filter: grayscale(100%);   }
+
+     100%   { -webkit-filter: grayscale(100%);   }
+
+  }
+
+  img{
+   /* -webkit-transform: scaleY(-1);
+    transform: scaleY(-1);*/
+  }
+
+    @font-face {
+
+      font-family: myFirstFont;
+      /*src:url("opendyslexic-regular-webfont.woff2"); */
+      src:url("SansForgetica-Regular.otf");
+    }
+
+  td {vertical-align:bottom; /*height: 600px;*/ }
+
+   body{
+    color: green;
+    background-color: black;
+     font-family: "myFirstFont";
+
+   }
+    #control {
+    position: fixed;
+    bottom: 0px;
+    width: 100%;
+    margin-bottom: 10px;
+    }
+    #screen{
+      font-size: 26px;
+      width: 100%;
+      height: 800px;
+      /*margin-top: 25%;*/
+    /*  color: blue; */
+      
+    /* font-family: "Comic Sans MS", cursive, sans-serif; */
+
+    }
+     #up-screen{
+      margin-left: 50%;
+      position: fixed;
+      top: 30px;
+      transform: translateX(-50%);
+     }
+     #down-screen{
+      margin-left: 50%;
+      position: fixed;
+      bottom: 60px;
+       transform: translateX(-50%);
+
+     }
+     #left-screen{
+      position: fixed;
+      top: 0%;
+      left: 0px; 
+
+      /*float: right; */
+     /*font-size: 26px;*/
+
+     }
+     #right-screen{
+      position: fixed;
+      top: 0%;
+      right: 0px; 
+      /* float: left; */
+      /*font-size: 26px;*/
+
+     }
+      #center-screen{
+      position: fixed;
+      top: 0%; /*15*/
+      margin-left: 50%;
+      transform: translateX(-50%);
+      width: 800px;
+      /*right: 0px; */
+      /* float: left; */
+      /*font-size: 26px;*/
+
+     }
+     #left-up-screen{
+      position: fixed;
+      top: 10%;
+      left: 0px; 
+     }
+     #right-up-screen{
+      position: fixed;
+      top: 10%;
+      right: 0px; 
+     }
+
+     #left-down-screen{
+      position: fixed;
+      left: 0px; 
+      bottom: 60px;
+     }
+     #right-down-screen{
+      position: fixed;
+      right: 0px; 
+      bottom: 60px;
+     }
+     #right-down-screen2{
+      position: fixed;
+      right: 0px; 
+      bottom: 0px;
+     }
+
+     .no-display{
+      display: none;
+     }
+
+     .no-display2{
+      visibility: hidden;
+     }
+
+       img {/*
+          -webkit-filter: grayscale(1);
+          -webkit-filter: grayscale(100%);
+          filter: gray;
+          filter: grayscale(100%);
+          filter: url(desaturate.svg#greyscale);*/
+
+
+      }
+
+    table td, table td * {
+      vertical-align: top;
+      table-layout: fixed; 
+    }
+  </style>
+</head>
+<body>
+<div id="screen" oncontextmenu="if(posicion-5>=0){ posicion-=5;  }else{ posicion=0; } n_mostrar=5;" onclick="if(posicion-12>=0){ posicion-=20;  }else{ posicion=0; }">
+  <div id="left-up-screen"></div>
+  <div id="right-up-screen"></div>
+  <div id="up-screen"></div>
+  <div id="left-screen"></div>
+  <div id="center-screen">
+    <center>
+      <!-- <img src="img/wis_image.png" style=" /*animation-name: example; animation-duration: 1s; animation-iteration-count: infinite;*/">  -->
+      <br>\WIS\
+     <!--  <br>
+      Word Image System -->
+      <br>
+      <div id="movie"></div>
+      <br>
+      <div id="sub-images" style="position: fixed; top: 70px; opacity: 0.5;"></div>
+      <br>
+      <div id="myCurrentCue" style="position: fixed; top: 50%; font-size: 50px; left: 75%; transform: translate(-50%, 0); z-index: 999999;/* opacity: 0.8; */ color: transparent;
+    -webkit-text-stroke-width: 1px; -webkit-text-stroke-color: rgb(198,237,43);"></div>
+
+
+      <!-- <x-gif src="http://i.imgur.com/iKXH4E2.gif"></x-gif> -->
+    <center>
+  </div>
+  <div id="right-screen"></div>
+  <div id="down-screen"></div>
+  <div id="left-down-screen"></div>
+  <div id="right-down-screen"></div>
+</div>
+<div id="right-down-screen2"><input type="button" value="hide" onclick="hide();" id="hide-btn"></div>
+
+<div id="control">
+  <a href="#" onclick="location.reload();" style="color:green; text-decoration:none;"><b>O</b></a>&nbsp;
+  <span id="menu-modules"></span>
+  <!-- <input  type="button" value="start" onclick="introMode=1; play();" id="play-btn"> -->
+  <input  type="button" value="start" onclick="start1(0);" id="start-btn">
+  
+  <input  type="button" value="subs on" onclick="bClue=!bClue; if(bClue){ c='visible'; $('#subs-btn').val('subs off'); }else{ c='hidden'; $('#subs-btn').val('subs on'); }  var style = $('<style>video::cue { visibility: '+c+'; }</style>');
+$('html > head').append(style);" id="subs-btn">
+  <script type="text/javascript">
+    bClue=1;
+    if(bClue){ c='visible'; $('#subs-btn').val('subs off'); }else{ c='hidden'; $('#subs-btn').val('subs on'); }  var style = $('<style>video::cue { visibility: '+c+'; }</style>');
+$('html > head').append(style);
+  </script>
+  
+
+  <input type="number" value="2000" id="start-time" style="width: 50px;" onClick="this.select();">
+  <input  type="button" value="stop" onclick="stopFlash();" style="display:none;">
+  <input  type="button" value="m" onclick="mu();" style="display:none;">
+  <input type="button" value="clearTxt" onclick="$('#input1').val(''); stopFlash();" style="display:none;">
+
+  <select id="velocityFlash" style="width: 75px; /*display:none;*/" onchange="calcularTiempo();">   
+    <option value="0">no speed</option>
+    <option value="40">40wpm</option>
+    <option value="45">45wpm</option>
+    <option value="50">50wpm</option>
+    <option value="55">55wpm</option>
+    <option value="60">60wpm</option>
+    <option value="65">65wpm</option>
+    <option value="70">70wpm</option>
+    <option value="75">75wpm</option>
+    <option value="80">80wpm</option>
+    <option value="85">85wpm</option>
+    <option value="90">90wpm</option>
+    <option value="95">95wpm</option>
+    <option value="100">100wpm</option>
+    <option value="105">105wpm</option>
+    <option value="110">110wpm</option>
+    <option value="115">115wpm</option>
+    <option value="120">120wpm</option>
+    <option value="125">125wpm</option> 
+    <option value="130">130wpm</option> 
+    <option value="135">135wpm</option> 
+    <option value="140">140wpm</option> 
+    <option value="145">145wpm</option> 
+    <option value="150">150wpm</option>
+    <option value="175">175wpm</option>
+    <option value="180">180wpm</option>
+    <option value="185">185wpm</option>
+    <option value="190">190wpm</option>
+    <option value="195">195wpm</option>
+    <option value="200">200wpm</option>
+     <option value="205">205wpm</option>
+    <option value="210">210wpm</option>
+    <option value="215">215wpm</option>
+    <option value="220">220wpm</option>
+    <option value="225">225wpm</option>
+     <option value="230">230wpm</option>
+    <option value="235">235wpm</option>
+    <option value="240">240wpm</option>
+    <option value="245">245wpm</option>
+    <option value="250">250wpm</option>
+    <option value="275">275wpm</option>
+    <option value="300" selected>300wpm</option>
+    <option value="325">325wpm</option>
+    <option value="350">350wpm</option>
+    <option value="375">375wpm</option>
+    <option value="400">400wpm</option>
+    <option value="425">425wpm</option>
+    <option value="450">450wpm</option>
+    <option value="475">475wpm</option>
+    <option value="500">500wpm</option>
+    <option value="525">525wpm</option>
+    <option value="550">550wpm</option>
+    <option value="575">575wpm</option>
+    <option value="600">600wpm</option>
+    <option value="625">625wpm</option>
+    <option value="650">650wpm</option>
+    <option value="675">675wpm</option>
+    <option value="700">700wpm</option>
+    <option value="725">725wpm</option>
+    <option value="750">750wpm</option>
+    <option value="775">775wpm</option>
+    <option value="800">800wpm</option>
+    <option value="825">825wpm</option>
+    <option value="850">850wpm</option>
+    <option value="875">875wpm</option>
+    <option value="900">900wpm</option>
+    <option value="925">925wpm</option>
+    <option value="950">950wpm</option>
+    <option value="975">975wpm</option>
+    <option value="1000">1000wpm</option>
+    <option value="1100">1100wpm</option>
+    <option value="1150">1150wpm</option>
+    <option value="1200">1200wpm</option>
+    <option value="1250">1250wpm</option>
+    <option value="1300">1300wpm</option>
+    <option value="1350">1350wpm</option>
+    <option value="1400">1400wpm</option>
+    <option value="1450">1450wpm</option>
+    <option value="1500">1500wpm</option>
+    <option value="1550">1550wpm</option>
+    <option value="1600">1600wpm</option>
+    <option value="1650">1650wpm</option>
+    <option value="1700">1700wpm</option>
+    <option value="1750">1750wpm</option>
+    <option value="1800">1800wpm</option>
+    <option value="1850">1850wpm</option>
+    <option value="1900">1900wpm</option>
+    <option value="1950">1950wpm</option>
+    <option value="2000">2000wpm</option>
+    <option value="2100">2100wpm</option>
+    <option value="2200">2200wpm</option>
+    <option value="2300">2300wpm</option>
+    <option value="2400">2400wpm</option>
+    <option value="2500">2500wpm</option>
+  </select>
+  <select id="wordsByFlash" onchange="wordsByFlash=n('wordsByFlash');" style="display:none;">   
+    <option value="1">1w</option>
+    <option value="2">2w</option>
+   <option value="3">3w</option>
+    <option value="4">4w</option>
+    <option value="5">5w</option>
+    <option value="6">6w</option>
+    <option value="7">7w</option> 
+    <option value="8">8w</option> 
+    <option value="9">9w</option> 
+    <option value="10">10w</option> 
+    <option value="11">11w</option> 
+    <option value="12">12w</option> 
+    <option value="13" selected>13w</option> 
+    <option value="14">14w</option> 
+  </select>
+  <select id="readingMode" onchange="bLugar=1; circleFase=0; readingMode=n('readingMode'); " style="display:none;">   
+    <option value="1"  >left-right</option>
+    <!--
+    <option value="2">up-down</option>
+    <option value="3">circle</option>
+    <option value="4">circle inv</option>
+    <option value="5">random Circle</option> -->
+    <option value="6" selected>center</option>
+    <!--
+    <option value="7">Square</option>
+    <option value="8">Cross</option>
+    <option value="9">Random Square</option>-->
+
+    <!--<option value="6">center</option>-->
+  </select>
+
+  <span id="mySelect2" style="display:none;"></span>
+  <span id="mySelect3" style="display:none;"></span>
+  <span id="movies" style=""></span>
+   <div class="dropdown">
+ <input type="text" value="1" id="pRate" style="width: 25px;" onchange="newPlayVelocity();">&nbsp;
+  <div class="dropdown-content" style="width: 70px !important;">
+    <select onchange="$('#pRate').val(this.value); newPlayVelocity();" class="mySelect">
+      <option value="0.5">0.5</option>
+      <option value="0.75">0.75</option>
+      <option value="1" selected>1</option>
+      <option value="1.25">1.25</option>
+      <option value="1.5">1.5</option>
+      <option value="1.75">1.75</option>
+      <option value="2">2</option>
+      <option value="2.25">2.25</option>
+      <option value="2.5">2.5</option>
+    </select>
+  </div>
+ </div>
+
+  <div class="dropdown">
+  <div class="dropdown-content" style="width: 70px !important; margin-bottom: 150px;">
+      line m0 <span id="l0"></span>
+    </div>
+   subs
+    
+   </div>
+   <input  type="button" value="r" onclick="myPage=_.random(0,countPages-1); $('#img-select3').val(myPage); stopFlash(); loadPage(myPage);" id="play-btn" style="display:none;">
+
+
+  <textarea rows="1" cols="22" style="margin-top: 5px; display:none;" id="input1" class="js-copytextarea"></textarea>
+
+<!-- <input type="button" value="colors on/off" onclick="bColors=!bColors;"> -->
+<!--<input  type="button" value="cw" onclick="bCW=!bCW;">-->
+<!-- <input type="button" value="rc" onclick="if(bColors==0){ bColors=1; } bRc=!bRc; clearTimeout(killIntervalRc);"> -->
+<select onchange="cambiarColores(this.value);" id="colors-select" style="width: 65px; display:none;">
+  <option value="1">Green</option>
+  <option value="2">Blue</option>
+  <option value="3">Gray</option>
+  <option value="4" selected>Color Alphabet</option>
+  <option value="5">Random colors</option>
+</select>
+<select onchange="cambiarTransformation(this.value);" id="transform-select" style="width: 90px; display:none;">
+  <option value="1">noTransform</option>
+  <option value="2">up-down</option>  
+  <option value="3">right to left</option>  
+  <!--<option value="4">All previous</option> -->
+  <option value="4">Skew</option> 
+  <option value="5">Random Skew</option>  
+</select>
+
+<select id="experiment-select" onchange="clearInterval(kill6); myExperiment=n('experiment-select');" style="display:none;">   
+    <option value="1" selected>>noExperiment</option>
+    <option value="2">longWordsPause</option>
+    <option value="3" >temporaryHideLetters</option>
+    <option value="4">PeripheralVisionSquare</option>
+    <option value="5" >PeripheralVisionCross</option>
+    <option value="6">PeripheralVisionLeftRight</option>
+    <option value="7">PeripheralVisionUpDown</option>
+    <option value="8" >vibration</option>
+    <option value="9">emotion</option>
+    <option value="10">face</option>
+  </select>
+  <span style="display:none;">
+   margin <input type="text" id="margin-text" onchange="changeMargin();" style="width: 35px;">
+  loop <select id="repeat-q" style="width: 40px;">    
+    <option value="1">1</option>
+    <option value="2">2</option>
+    <option value="3">3</option>
+    <option value="4">4</option>
+    <option value="5">5</option>
+    <option value="6">6</option>
+    <option value="7">7</option>
+    <option value="8">8</option>
+    <option value="9">9</option>
+    <option value="10">10</option>
+    </select>
+    <input type="text" value="50" id="loop-buffer" style="width:35px;">
+  </span>
+  <input type="button" value="rndTxt" onclick="getRndTxt();" id="rnd-btn" style="display:none;">&nbsp;
+  <span style="/*display:none;*/">
+  <span style="display:none;"> n-img  </span>
+  <select id="repeat-w" style="width: 60px; display:none;">    
+    <option value="0"  selected>none</option>
+     <option value="1">1</option> 
+    <option value="2">2</option>
+    <option value="3">3</option> -->
+    <option value="4">4</option>
+    <option value="5">5</option> 
+    <option value="6">6</option>
+     <option value="7">7</option> 
+    <option value="8">8</option>
+     <option value="9">9</option> 
+    <option value="10">10</option>
+    <option value="11">11</option>
+    <option value="12">12</option>
+    <option value="13">13</option>
+    <option value="14">14</option>
+    <option value="15">15</option>
+    <option value="16">16</option>
+    <option value="17">17</option>
+    <option value="18">18</option>
+    <option value="19">19</option>
+    <option value="20">20</option>
+    <option value="21">21</option>
+    <option value="22">22</option>
+    <option value="23">23</option>
+    <option value="24">24</option>
+ </select>
+ </span>
+
+ <span id="mySelect" style="display:none;"></span>
+ <select id="hideWord" style="width: 80px; display:none;">    
+    <option value="0"  selected>0%</option>
+    <option value="10">10%</option>
+    <option value="20">20%</option>
+    <option value="25">25%</option>
+    <option value="30">30%</option>
+    <option value="40">40%</option>
+    <option value="50">50%</option>
+    <option value="60">60%</option>
+    <option value="70">70%</option>
+    <option value="75">75%</option>
+    <option value="80">80%</option>
+    <option value="90">90%</option>
+    <option value="100">100%</option>
+  </select>
+
+  <select id="database" style="/*width: 40px;*/ display:none;">    
+    <option value="1">current txt</option>
+    <option value="2"  selected>lemario</option>
+    <option value="3">ES 1</option>
+    <option value="4">ES 2</option>
+    <option value="6">nombres</option>
+  </select>
+
+   <select id="animation" style="display:none;">    
+    <option value="1">no animation</option>
+    <option value="2">blur angle zoom</option>
+    <option value="3" >zoom</option>
+    <option value="4">zoom out</option>
+    <option value="5">blur</option>
+    <option value="6" >angle</option>
+    <option value="7" >flip y</option>
+    <option value="8" >zoom out</option>
+    <option value="9">gray scale</option>
+    <option value="10"  selected>zoom light</option>
+    <option value="11">speed flip</option>
+  </select>
+  <select id="agrupationImages" style="display:none;" onchange="newAgrupation();">    
+    <option value="0" selected>no img agrupation</option>
+    <option value="2">2</option>
+    <option value="3">3</option>
+    <option value="4">4</option>
+    <option value="5">5</option>
+    <option value="6">6</option>
+    <option value="7">7</option>
+    <option value="8">8</option>
+    <option value="9">9</option>
+    <option value="10">10</option>
+    <option value="11">11</option>
+    <option value="12">12</option>
+    <option value="13">13</option>
+    <option value="14">14</option>
+    <option value="15">15</option>
+  </select>
+   <select id="velocity2" style="width: 75px; display:none;" onchange="">   
+    <option value="40">40wpm</option>
+    <option value="45">45wpm</option>
+    <option value="50">50wpm</option>
+    <option value="55">55wpm</option>
+    <option value="60">60wpm</option>
+    <option value="65">65wpm</option>
+    <option value="70">70wpm</option>
+    <option value="75">75wpm</option>
+    <option value="80">80wpm</option>
+    <option value="85">85wpm</option>
+    <option value="90">90wpm</option>
+    <option value="95">95wpm</option>
+    <option value="100">100wpm</option>
+    <option value="105">105wpm</option>
+    <option value="110">110wpm</option>
+    <option value="115">115wpm</option>
+    <option value="120">120wpm</option>
+    <option value="125">125wpm</option> 
+    <option value="130">130wpm</option> 
+    <option value="135">135wpm</option> 
+    <option value="140">140wpm</option> 
+    <option value="145">145wpm</option> 
+    <option value="150">150wpm</option>
+    <option value="175">175wpm</option>
+    <option value="180">180wpm</option>
+    <option value="185">185wpm</option>
+    <option value="190">190wpm</option>
+    <option value="195">195wpm</option>
+    <option value="200">200wpm</option>
+     <option value="205">205wpm</option>
+    <option value="210">210wpm</option>
+    <option value="215">215wpm</option>
+    <option value="220">220wpm</option>
+    <option value="225">225wpm</option>
+     <option value="230">230wpm</option>
+    <option value="235">235wpm</option>
+    <option value="240">240wpm</option>
+    <option value="245">245wpm</option>
+    <option value="250"  selected>250wpm</option>
+    <option value="275">275wpm</option>
+    <option value="300">300wpm</option>
+    <option value="325">325wpm</option>
+    <option value="350">350wpm</option>
+    <option value="375">375wpm</option>
+    <option value="400">400wpm</option>
+    <option value="425">425wpm</option>
+    <option value="450">450wpm</option>
+    <option value="475">475wpm</option>
+    <option value="500">500wpm</option>
+    <option value="525">525wpm</option>
+    <option value="550">550wpm</option>
+    <option value="575">575wpm</option>
+    <option value="600">600wpm</option>
+    <option value="625">625wpm</option>
+    <option value="650">650wpm</option>
+    <option value="675">675wpm</option>
+    <option value="700">700wpm</option>
+    <option value="725">725wpm</option>
+    <option value="750">750wpm</option>
+    <option value="775">775wpm</option>
+    <option value="800">800wpm</option>
+    <option value="825">825wpm</option>
+    <option value="850">850wpm</option>
+    <option value="875">875wpm</option>
+    <option value="900">900wpm</option>
+    <option value="925">925wpm</option>
+    <option value="950">950wpm</option>
+    <option value="975">975wpm</option>
+    <option value="1000">1000wpm</option>
+    <option value="1100">1100wpm</option>
+    <option value="1150">1150wpm</option>
+    <option value="1200">1200wpm</option>
+    <option value="1250">1250wpm</option>
+    <option value="1300">1300wpm</option>
+    <option value="1350">1350wpm</option>
+    <option value="1400">1400wpm</option>
+    <option value="1450">1450wpm</option>
+    <option value="1500">1500wpm</option>
+    <option value="1550">1550wpm</option>
+    <option value="1600">1600wpm</option>
+    <option value="1650">1650wpm</option>
+    <option value="1700">1700wpm</option>
+    <option value="1750">1750wpm</option>
+    <option value="1800">1800wpm</option>
+    <option value="1850">1850wpm</option>
+    <option value="1900">1900wpm</option>
+    <option value="1950">1950wpm</option>
+    <option value="2000">2000wpm</option>
+    <option value="2100">2100wpm</option>
+    <option value="2200">2200wpm</option>
+    <option value="2300">2300wpm</option>
+    <option value="2400">2400wpm</option>
+    <option value="2500">2500wpm</option>
+  </select>
+   <select id="audioChannel" style="display:none;" onchange="">   
+    <option value="0" selected>none</option>
+    <option value="1">notes</option>
+    <option value="2">tts</option>
+  </select>
+  <span style="display:none;">
+   collision <select id="collision" style="/*width: 40px;*/">    
+    <option value="100">100%</option>
+    <option value="95">95%</option>
+    <option value="90">90%</option>
+    <option value="85">85%</option>
+    <option value="80">80%</option>
+    <option value="75">75%</option>
+    <option value="70">70%</option>
+    <option value="65">65%</option>
+    <option value="60">60%</option>
+    <option value="55">55%</option>
+    <option value="50">50%</option>
+    <option value="45">45%</option>
+    <option value="40">40%</option>
+    <option value="35">35%</option>
+    <option value="30"  selected>30%</option>
+    <option value="25">25%</option>
+    <option value="20">20%</option>
+    <option value="15">15%</option>
+    <option value="10">10%</option>
+   </select> 
+
+
+   loop
+   <input type="checkbox" onclick="bLoop=!bLoop;">
+   </span>
+   <button class="btn btn-primary js-textareacopybtn" style="display:none;">Copy</button>
+   &nbsp;
+   imgPlus
+    <select id="imagePlus" style="/*width: 40px;*/">    
+    <option value="0" selected>0</option>
+    <option value="1">1</option>
+    <option value="2">2</option>
+    <option value="3">3</option>
+    <option value="4">4</option>
+    <option value="5">5</option>
+    <option value="6">6</option>
+    <option value="7">7</option>
+    <option value="8">8</option>
+    <option value="9">9</option>
+  </select>
+
+<input  type="button" value="?" onclick="alert('Word Image System\nLicence: GNU https://github.com/vernetit/WIS\ncontact: robertchalean@gmail.com');">
+ <span id="stats" style="font-size: 12px;"></span> &nbsp; <span id="stats2" style="font-size: 12px;"></span>
+</div>
+<div id="preload" style="display:none;"></div>
+<div id="preload2" style="display:none;"></div>
+<div id="image-plus"></div>
+  
+
+
+<div id="txt-1" style="display:none;"></div>
+<div id="txt-2"  style="display:none;">></div>
+<div id="txt-3" style="display:none;"></div>
+<div id="txt-4" style="display:none;"></div>
+<div id="txt-5" style="display:none;"></div>
+<div id="txt-6" style="display:none;"></div>
+<div id="preload-1" style="opacity: 0.1;"></div>
+
+
+<script type="text/javascript">
+
+//plus
+var position_image;
+var array_image_plus=[];
+var array_image_plus_total=[];
+var cantidad_img_plus=32;
+bImgPlus=1;
+
+function loadImageDir(myDir,myVar){
+
+  const fs6= require("fs"); 
+
+  fs6.readdir(/*'images/gif/'*/myDir, (err, dir) => {
+
+     xxx=0;
+     arrayImg=[];
+
+    
+    for (var i = 0, path; path = dir[i]; i++) {
+
+
+      //console.log(""+path.indexOf("."));
+      if(path.indexOf(".")!=0 || path.indexOf(".jpg")!=-1 || path.indexOf(".png")!=-1  || path.indexOf(".jpeg")!=-1 || path.indexOf(".gif")!=-1 || path.indexOf(".bmp")!=-1){
+        //console.log(`images/${fd}/${path}`)
+       
+        arrayImg[xxx]=myDir+`/${path}`;
+        xxx++;
+      }
+      //if(i==10) break;
+    }
+     // console.log(arrayImages1)
+    arrayImg=_.shuffle(arrayImg);
+
+    eval(`${myVar}=_.extend(arrayImg);`)
+
+  });
+}
+
+loadImageDir("images/smiley3","array_image_plus_total");
+
+
+function preloadImageDir(myArray,myDiv){
+
+  //console.log(myArray)
+  poner="";
+  for(var i=0;i<myArray.length;i++){
+    poner+=`<img src="${myArray}">`;
+
+  }
+
+  $("#"+myDiv).html(poner);
+}
+
+
+setTimeout(function(){  preloadImageDir(array_image_plus_total,"preload2") },1000);
+
+var kill2;
+
+function start1(x){
+
+  if(x==0){
+    bStart=!bStart
+
+    if(!bStart){
+
+      $("#start-btn").val("start")
+
+
+      clearTimeout(kill1); clearTimeout(kill2);// c.fillStyle = "black"; c.fillRect(0,0,cw,40);
+
+      return;
+    }
+
+    $("#start-btn").val("stop")
+
+    bFirst=0;
+
+    // var limpia = "";
+    // resultados = "";
+    // cantidadPalabras = 0;
+
+    // str = $("#input1").val();
+
+    // limpia = str.split("\n").join(" ");
+    // limpia = limpia.split("\t").join(" ");
+    // limpia = limpia.split("\r").join(" ");
+    // limpia = limpia.split(",").join(" ");
+    // limpia = limpia.split(".").join(" ");
+    // limpia = limpia.split(")").join(" ");
+    // limpia = limpia.split("(").join(" ");
+    // limpia = limpia.split(";").join(" ");
+    // limpia = limpia.split("-").join(" ");
+
+    // limpia = limpia.split("   ").join(" ");
+    // limpia = limpia.split("  ").join(" ");
+
+    // str = limpia;
+
+    // cadena=str.split(" ");
+    // cadena.unshift(" ");
+    // cantidad=cadena.length;
+    // posicion = 0;
+
+    pRate=parseFloat($("#pRate").val());
+
+    clearTimeout(kill2);
+
+    myMovie=$("#img-select6").val();
+
+     if(myMovie!="-1"){
+      // moviesActive.push(0);
+
+      tam_x=640;
+      tam_y=480;
+
+       tam_x=1280;
+      tam_y=720;
+
+      // tam_x=320;
+      // tam_y=240;
+
+
+      sub=subName(myMovie);
+      $("#movie").html(`
+            <video  width="${tam_x}" height="${tam_y}" id="m0" <!--autoplay-->>
+              <source src="${myMovie}" type="video/mp4">
+              <!-- <track src="${sub}" kind="subtitle" srclang="en-US" label="English" /> -->
+              <track label="Spanish" kind="subtitles" srclang="en" src="${sub}" id="c0" default>
+            </video>
+          `);
+
+      }
+
+      $("#m0").get(0).oncanplay = function(){        
+
+        if(bFirst==1) return;
+
+        if(myMovie!="-1") $("#m0").get(0).playbackRate = pRate;
+      
+
+        //     $('video').videoSub({
+        //   containerClass:     'videosub-container',
+        //   barClass:           'videosub-bar',
+        //   useBarDefaultStyle: false
+        // });
+
+        bFirst=1;
+
+        //console.log("hola")
+
+        if(myMovie!="-1") total_time=$("#m0").get(0).duration;
+        
+
+        //console.log(total_time)
+
+        if(myMovie!="-1") $("#m0").get(0).currentTime=n("start-time");
+        
+
+        init1(0);
+      };
+
+  }
+}
+
+function limpiar(x){
+
+  str=x;
+
+   limpia = str.split("\n").join(" ");
+    limpia = limpia.split("\t").join(" ");
+    limpia = limpia.split("\r").join(" ");
+    limpia = limpia.split(",").join(" ");
+    limpia = limpia.split(".").join(" ");
+    limpia = limpia.split(")").join(" ");
+    limpia = limpia.split("(").join(" ");
+    limpia = limpia.split(";").join(" ");
+    limpia = limpia.split(":").join(" ");
+    limpia = limpia.split("-").join(" ");
+    limpia = limpia.split("ñ").join("nn");
+    limpia = limpia.split("”").join(" ");
+    limpia = limpia.split("“").join(" ");
+    limpia = limpia.split("—").join(" ");
+    limpia = limpia.split("«").join(" ");
+    limpia = limpia.split("«").join(" ");
+    limpia = limpia.split("»").join(" ");
+    limpia = limpia.split("‘").join(" ");
+    limpia = limpia.split("...").join(" ");
+    limpia = limpia.split("…").join(" "); // 3 puntos en un solo bloque 
+    limpia = limpia.split("\"").join(" ");
+    limpia = limpia.split("–").join(" ");
+    limpia = limpia.split("'").join(" ");
+    limpia = limpia.split("¡").join(" ");
+    limpia = limpia.split("!").join(" ");
+    limpia = limpia.split("¿").join(" ");
+    limpia = limpia.split("?").join(" ");
+    limpia = limpia.split("ü").join("u");
+    limpia = limpia.split(">").join(" ");
+    limpia = limpia.split("♪").join(" ");
+
+    limpia = limpia.split("   ").join(" ");
+    limpia = limpia.split("  ").join(" ");
+
+    return limpia;
+}
+
+
+library=[];
+
+currentCue=-1;
+myCues=[];
+
+function _imagePlus(){
+
+  if(bImgPlus){
+
+   // console.log("imagePlus")
+
+    position_image=$("#m0").position();
+    //console.log(position_image)
+    array_image_plus=_.shuffle(array_image_plus)
+
+    $("#image-plus").html("");
+
+    for(var i=0;i<8;i++){
+
+      if(position_image.top==0) break;
+      if(i==n("imagePlus")) break;
+
+      p_x=_.random(position_image.left+500,position_image.left+$(window).width()-100);
+      p_y=_.random(position_image.top,position_image.top+650);
+
+      imgP=array_image_plus[i].replace("@","img-p-"+i);
+
+      //console.log(imgP)
+
+      //console.log($("#image-plus").append(imgP));
+
+      $("#image-plus").append(imgP)
+
+      //console.log(imgP)
+
+      $("#img-p-"+i).css("left",p_x+"px")
+      $("#img-p-"+i).css("top",p_y+"px")
+    
+
+    
+    }
+  }
+
+  //console.log($("#image-plus").html());
+
+  setTimeout(function(){ _imagePlus(); },400);
+}
+
+textVelocity=0;
+
+function init1(x){
+
+  if(x==0){
+
+    textVelocity=n("velocityFlash");
+
+    if(textVelocity>0){
+
+      c='hidden'; var style = $('<style>#sub-images{ visibility: '+c+';   }  video::cue { visibility: '+c+'; }</style>');
+      $('html > head').append(style);
+    }
+
+    //x1=cw-100;
+    //$("#m0").get(0).play();
+    // currenWord=cadena[posicion];
+    // tam=currenWord.length;
+    // plus=0;
+    // if(tam<=3) plus=+n("vel-3")
+    // if(tam>=10) plus=-n("vel-3")
+    // multiplo=1;
+
+  }
+
+  var videoElement = document.querySelector("video");
+  var textTracks = videoElement.textTracks; // one for each track element
+  var textTrack = textTracks[0]; // corresponds to the first track element
+  var kind = textTrack.kind // e.g. "subtitles"
+  var mode = textTrack.mode // e.g. "disabled", hidden" or "showing"
+
+  var trackElements = document.querySelectorAll("track");
+
+  //console.log(trackElements)
+  //console.log(textTrack.cues[0])
+
+  library=[];
+  library2=[]
+  library3=[]
+
+  //ws=arrayImages[i].split("/")[2].split("_")[0];
+
+   
+    contador=0;
+    count_img=0;
+
+       tam_imagen_w=100.0+"";
+    tam_imagen_h=100.0+"";
+
+    classImage="/*no-display2*/ ci"
+
+    x4=0;
+
+    myCues=[];
+    no_image_array=[];
+
+    x_no_image=0;
+
+  for(var j=0;j<textTrack.cues.length;j++){
+
+    library3[j]=[];
+
+    txt=textTrack.cues[j].text;
+    myCues[j]=txt;
+    str=limpiar(txt);
+    arr_str=str.split(" "); 
+
+    _p="";
+
+    for(var k=0;k<arr_str.length;k++){
+
+        contadorImagenes=0;
+        
+        cw=arr_str[k];
+
+        _palabra = quitaAcentos(cw.toLowerCase().split(" ").join(""));      
+
+        //if(_palabra=="") continue;
+
+        _palabra1 = _palabra.toLowerCase().split(" ").join("");      
+        _palabra3 = _palabra;
+
+         v = `[/_]${_palabra}\[0-9]*[._]`;
+        re = new RegExp (v,"g");
+
+        _myImg=`<img src="img_trans.gif" width="${tam_imagen_w}" height="${tam_imagen_h}">`;
+        _myImg=``;
+
+       for(var l=0;l<arrayImages.length;l++){
+
+            // _myImg="";
+            // if( arrayImages[j].split("ñ").join("n").indexOf("/"+quitaAcentos(cadena[i].toLowerCase().split(" ").join("").split("ñ").join("n") )+".") !=-1 /*&& cadena[i].length>=3*/ ){
+            if( 
+                // arrayImages[j].indexOf("/"+quitaAcentos( cadena[i].toLowerCase().split(" ").join("") )+".") !=-1 /*&& cadena[i].length>=3*/ ||
+                // arrayImages[j].indexOf("/"+quitaAcentos( cadena[i].toLowerCase().split(" ").join("") )+"_") !=-1 /*&& cadena[i].length>=3*/ ||
+                // arrayImages[j].indexOf("_"+quitaAcentos( cadena[i].toLowerCase().split(" ").join("") )+"_") !=-1 /*&& cadena[i].length>=3*/ 
+                
+                ( _palabra.length>2 || ( _palabra1=="id" || _palabra1=="eh" ||  _palabra1=="él" ||   _palabra1=="4" || _palabra1=="yo" || _palabra1=="ya" || _palabra1=="sí" || _palabra1=="té" || _palabra=="no" || _palabra=="ay" || _palabra=="ir" || _palabra=="va" || _palabra=="ah"  || _palabra=="he"  || _palabra=="ha"  || _palabra=="qué"  || _palabra=="tú"  || _palabra=="vi"  || _palabra=="ví" || _palabra=="oh" || _palabra=="es" || _palabra=="tú" || _palabra=="mi" || _palabra=="mí" || _palabra=="da"  || _palabra=="ni" ) ) 
+                && 
+                arrayImages[l].search(re) !=-1 
+                && ( _palabra!="que" )
+
+                // arrayImages[j].search("/"+quitaAcentos( cadena[i].toLowerCase().split(" ").join("") )+"_") !=-1 /*&& cadena[i].length>=3*/ ||
+                // arrayImages[j].search("_"+quitaAcentos( cadena[i].toLowerCase().split(" ").join("") )+"_") !=-1 /*&& cadena[i].length>=3*/ 
+             ){
+              
+              //console.log( contador +" "+cadena[i]+" "+arrayImages[j]);
+              //console.log( arrayImages[j].indexOf(cadena[i].toLowerCase() ) )
+
+              classImage="/*no-display2*/ ci"
+              
+              if(contadorImagenes==0){
+
+                array_img[count_img]=arrayImages[l];
+                count_img++;
+
+                _myImg=`<img src="${arrayImages[l]}" width="${tam_imagen_w}" height="${tam_imagen_h}" class="${classImage}" style="" onload="zPreload++; if(zPreload==_.uniq(arrayImagesPreload).length-1){ init(0); zPreload++; }">`;
+               
+
+              }else{
+
+                myBr="";
+                if(readingMode==1) continue;
+                if(wordsByFlash>1) myBr="<br>";
+
+                array_img[count_img]=arrayImages[l];
+                count_img++;
+
+                _myImg+=`${myBr}<img src="${arrayImages[l]}" width="${tam_imagen_w}" height="${tam_imagen_h}" class="${classImage} /*ge*/"  style="/*display: block;*/  /*animation-name: example; animation-duration: 0.2s;*/">`;
+                
+                
+              }
+              
+              
+              contador++; contadorImagenes++;
+
+              //console.log ( i + " " + contadorImagenes +" "+ _palabra + " " + arrayImages[j] )
+
+            }  //if match dictionary    
+
+          }//for l arrayImages
+
+          //if(_palabra=="forma"){ console.log(j);  } 
+          //library[`${_palabra}`]=_myImg;
+          library2[x4]=[];
+          library2[x4][0]=_palabra;
+          library2[x4][1]=_myImg ;
+
+          if(_myImg=="" && _palabra.length>2){
+
+            no_image_array[x_no_image]=_palabra;
+            x_no_image++;
+          }
+
+          x4++;
+
+          _p+=_myImg;
+          //console.log( _palabra + " " + _myImg)
+          //console.log(j);
+     
+    }//k
+
+    library3[j][0]=txt;
+    library3[j][1]=_p
+
+    //if(j==100) break;
+
+    //textTrack.cues[j].line=100;
+
+    //console.log(textTrack.cues[0].text);
+  }//j
+
+  //track.activeCues[0].line = 100;
+
+  no_image_array=_.uniq(no_image_array);
+  console.log(no_image_array.length)
+  console.log(no_image_array)
+
+
+
+  $("#m0").get(0).play();
+  
+   array_image_plus_total=_.shuffle(array_image_plus_total); 
+   for(i=0;i<array_image_plus_total.length;i++){
+
+      array_image_plus[i]=`<img src="${array_image_plus_total[i]}" width="64" height="64" class="myImagePlus" style="position: fixed; opacity: 1;" id="@">`;
+    }
+
+  _imagePlus();
+
+
+
+  /*
+  for(var i=0;i<library2.length;i++){
+    library[ library2[i][0] ] = library2[i][1];
+  }*/
+
+  //console.log(library2.length)
+  //console.log(library2)
+  //console.log(library3)
+
+ /*
+  // for each track element
+  for (var i = 0; i < trackElements.length; i++) {
+    //trackElements[i].addEventListener("load", function() {
+      var textTrack = trackElements.track[0]; // gotcha: "this" is an HTMLTrackElement, not a TextTrack object
+     // var isSubtitles = textTrack.kind === "subtitles"; // for example...
+      // for each cue
+      for (var j = 0; j < textTrack.cues.length; ++j) {
+        var cue = textTrack.cues[j];
+        console.log(cue)
+        // do something
+      }
+     //});
+  }*/
+
+  bSearched=0;
+
+  textTrack.oncuechange = function (){
+
+    // "this" is a textTrack
+  var cue = this.activeCues[0]; // assuming there is only one active cue
+  //console.log(cue.line)
+  //cue.line=30; 
+  if(bClue){
+
+    if(textVelocity>0){
+
+      myTxtCue=limpiarCue( cue.text );
+      myTxtCueArray=myTxtCue.split(" ");
+
+      myAcum=0;
+      timeCue=( 60000/ n("velocityFlash") ) * 1;
+      for(indexCue=0;indexCue<myTxtCueArray.length;indexCue++){
+
+        poner=myTxtCueArray[indexCue];
+        setTimeout(function(poner){ $("#myCurrentCue").html(poner); setTimeout(function(){ $("#myCurrentCue").html("");  },timeCue-25);  },indexCue*timeCue,poner);
+      }
+
+      setTimeout(function(poner){ $("#myCurrentCue").html("");   },(indexCue+1)*timeCue,poner);
+
+    }else{
+
+      $("#myCurrentCue").html(cue.text);
+    }
+
+  }else $("#myCurrentCue").html("");
+  //var obj = JSON.parse(cue.text);
+  var obj = cue.text;
+
+    //if(currentCue==-1){
+     // $("#m0").get(0).pause();
+
+      for(var j=0; j < myCues.length; j++){
+
+        if(myCues[j]==obj && !bSearched){currentCue=j; bSearched=1; break; }
+
+
+      }
+    //}
+
+
+  try{
+    $("#sub-images").html(library3[currentCue][1]);
+  }catch(err){
+
+  }
+
+  currentCue++;
+  
+
+
+
+
+
+/*
+  var str=limpiar(obj);
+  var str_array=str.split(" ");
+  //console.log(str_array)
+  var poner = "";
+
+  $("#sub-images").html("");
+  for(var jj=0;jj<str_array.length;jj++){
+
+
+    var _w=quitaAcentos( str_array[jj].toLowerCase().split(" ").join("") );
+
+     if(_w=="") continue;
+
+    _p="";
+    for(var kk=0;kk<library2.length;kk++){
+
+      if(_w==library2[kk][0]){ _p=library2[kk][1]; break; }
+    }
+    
+    try{
+      //poner+=_p;
+      $("#sub-images").append(_p);
+    }catch(err){
+
+    }
+
+  }
+
+ // $("#sub-images").html(poner);*/
+
+
+    //console.log(obj);
+  // do something
+  }//oncuechange
+
+/*
+  setInterval(function(){
+     myvideo = this;
+
+        var aTextTrack =  this.textTracks()[0];
+        aTextTrack.on('loaded', function() {
+            console.log('here it is');
+            cues = aTextTrack.cues();   //subtitles content is here
+            console.log('Ready State', aTextTrack.readyState()) 
+            console.log('Cues', cues);
+        });
+
+        //this method call triggers the subtitles to be loaded and loaded trigger
+        aTextTrack.show();
+
+  },100)
+*/
+
+/*
+   _l=parseInt($("#l-0").val());
+
+      if(_l!=-1){
+         track = document.getElementById('c0').track;
+         for(j=0;j<track.cues.length;j++){ track.cues[j].line=_l; }
+      }
+
+    console.log(track)*/
+  
+
+  //console.log(currenWord)
+  //console.log(x1)
+
+  // c.fillStyle = "black"; c.fillRect(0,0,cw,40);
+  
+  // c.font= font_size + "px Georgia";
+
+  // if(bColors){
+
+  //   // if(indexColors>=colors.length) indexColors=0;
+  //   // _c=colors[indexColors]; indexColors++;
+
+    
+  //   //console.log(rainbow.colourAt(1));
+    
+  //   _t=cw/_rango;
+  //   _t1=cw%_rango;
+
+  //   myPos=0;
+  //   for(__i=0;__i<_rango;__i++){
+
+  //     if(x1>=__i*_t && x1<=(__i*_t)+_t ) break;
+  //   }
+
+  //   //console.log(__i)
+
+  //   _c="#"+rainbow.colourAt(__i+1);
+
+  //   c.fillStyle = _c;
+
+  // }else{
+
+
+  //   c.fillStyle = "green";
+
+  // }
+  
+  // c.fillText(currenWord,x1,30);
+
+  plus=0;
+  //x1-=((n("vel")+plus)*multiplo)
+
+  // if(x1<=-150){ 
+
+  //   // t_fin = Date.now();
+  //   // t_dif = t_fin - t_ini;
+  //   // wpm = Math.round(60000/t_dif);
+  //   multiplo=-1;
+
+  //   //console.log(t_dif)
+
+  //   calcularTiempo();
+
+  //   ///*posicion++;*/ /*start(1);*/ return; 
+
+  // }
+  // if(x1>=cw-100){
+
+  //   multiplo=1;
+
+  // }
+
+  // $("#movie").css("left",x1+"px")
+
+
+  // kill1=setTimeout(function(){init(1);},1)
+
+  //setTimeout(function(){start(1)},n("vel"))
+}
+
+
+  // if(posicion>=cantidad){
+
+  //   return;
+  // }
+
+  // t_ini = Date.now();
+
+  // init(0);
+  //init1(0);
+  //setTimeout(function(){ init1(0) } );
+
+  
+
+
+var bStart=0, cadena, posicion, cantidad, indexColors=0;
+
+function subName(x){
+
+  a=x.replace(".mp4","");
+  return a+".vtt";
+
+}
+
+
+//bSwap
+bSwap=0;
+bSwapText=0;
+
+zPreload=0;
+
+bCuentas=0;
+bPixelate=0;
+bPixelate2=1;
+
+$("#velocity2").hide();
+
+var sound1 = new Howl({
+  src: ['click.mp3']
+});
+id=sound1.play();
+sound1.stereo(-1, id);
+
+/*
+window.onload = function () {
+  MIDI.loadPlugin({
+    soundfontUrl: "./soundfont/",
+    instrument: "acoustic_grand_piano",
+    onprogress: function(state, progress) {
+      console.log(state, progress);
+    },
+    onsuccess: function() {
+      var delay = 0; // play one note every quarter second
+      var note = 51; // the MIDI note
+      var velocity = 127; // how hard the note hits
+      // play the note
+      //MIDI.setVolume(0, 127);
+      //MIDI.noteOn(0, note, velocity, delay);
+      //MIDI.noteOff(0, note, delay + 0.75);
+    }
+  });
+};*/
+
+/*
+const { spawn } = require('child_process');
+const child = spawn('say hola');
+*/
+
+const { exec } = require('child_process');
+
+
+/*
+exec('say hola', (err, stdout, stderr) => {
+  if (err) {
+    console.error(`exec error: ${err}`);
+    return;
+  } //console.log(`Number of files ${stdout}`);
+});
+*/
+
+n_mostrar="-1";
+bPlace=0;
+bTts=0;
+
+
+/*
+var currentSpanishVoice;
+var currentEnglishVoice;
+var voices;
+
+speechSynthesis.onvoiceschanged = function() {
+  var voices = this.getVoices();
+  bBuscarEspañol=0;
+
+  for(i=0;i<voices.length;i++){
+
+    
+    if(voices[i].lang.indexOf("es")!=-1){
+        currentSpanishVoice=voices[i];
+        break;
+      
+    }
+    
+    
+    
+  }
+  for(i=0;i<voices.length;i++){
+
+    
+    
+    
+    if(voices[i].lang.indexOf("en")!=-1){
+        currentEnglishVoice=voices[i];
+        break;
+    }
+    
+  }
+
+  //console.log(currentSpanishVoice);
+  //console.log(currentEnglishVoice);
+};
+
+var language=1;
+var lang;
+
+*/
+
+
+
+var medida1 = " abcdefghijklmnñopqrstuvwxyz";
+var arrayPuntajeLetras = [12.53,1.42,4.68,5.86,13.68,0.69,1.01,0.7,6.25,0.44,0.01,4.97,3.15,6.71,0.31,8.68,2.51,0.88,6.87,7.98,4.63,3.93,0.90,0.02,0.22,0.90,0.52,100];
+
+Waud.init();
+
+ll=[];
+lll=[];
+_l4=[];
+
+
+var arrayMySound = [];
+
+var kill,kill1;
+
+
+notesTone=["C4","C#4","D4","D#4","E4","F4","F#4","G4","G#4","A4","A#4","B4","C5","C#5","D5","D#5","E5","F5","F#5","G5","G#5","A5","A#5","B5","C5","C#5","D6","A3"];
+
+var arrayLetras = ["a","b","c","d","e","f","g","h","i","j","k","l","m","n","nn","o","p","q","r","s","t","u","v","w","x","y","z","espacio"];
+
+for(i = 0; i<arrayLetras.length; i++){
+  
+  arrayMySound[i] = new WaudSound("notas/"+arrayLetras[i]+".mp3");
+  
+}
+
+val=48;
+for(j = 0; j<arrayLetras.length; j++){
+  if(arrayLetras[j]=="espacio") val=45;
+  ll[arrayLetras[j]]=arrayMySound[j];
+  lll[arrayLetras[j]]=notesTone[j];
+  _l4[arrayLetras[j]]=val;
+  val++;
+
+}
+
+//console.log(_l4)
+
+
+arrayLength=[];
+
+introMode=1;
+
+require('./renderer.js')
+const fs= require("fs");
+const fs2= require("fs");
+const fs3= require("fs");
+const fs4= require("fs"); //gif
+const fs5= require("fs"); 
+const fs6= require("fs"); 
+
+fd="";
+var arrayDirs=[];
+
+var fd6;
+
+fs.readdir('movies/', (err, dir) => {
+   sel=`<select id="img-select6" onchange="/*openFiles(this.value);*/" style="width:150px;">
+    <option value="-1">---</option>
+
+   `;
+   bFirstDir=0;
+   //fd="";
+   arrayDirs=[]; z=0;
+    for (var i = 0, path; path = dir[i]; i++) {
+
+     
+
+      //console.log(""+path.indexOf("."));
+      if(path.indexOf(".")!=0){
+        if(!bFirstDir){
+          bFirstDir=1;
+          //fd=path;
+
+        }
+        if(path.indexOf(".mp4")==-1) continue;
+        sel+=`<option value="movies/${path}">`+(path)+`</option>`;
+        arrayDirs[z]=path; z++;
+      }
+    }
+    sel +="</select>";
+    fd6=arrayDirs[0];
+
+    $("#movies").html(sel);
+   
+
+    //debug
+
+    // $("#img-select").prop('selectedIndex', 1);
+    $("#img-select6").val("movies/The.Perks.of.Being.a.Wallflower.2012.720p.BRrip.x264.GAZ.YIFY.mp4");
+   
+  
+});
+
+bWiki=0; //variable para cargar el diccionario
+
+if(bWiki){
+
+  myWiki = fs5.readFileSync("texts/rae.txt",'utf8');
+  // myWiki = myWiki+"";
+
+  // console.log(myWiki.length)
+
+  myWikiArray=myWiki.split(">");
+
+  //console.log(myWikiArray.length);
+
+
+  x=0;
+  wiki=[];
+
+  for(i=2;i<myWikiArray.length;i++){
+    wiki[x]=[];
+    myLema=myWikiArray[i].split(".");
+    //console.log(myLema[0]);
+    
+    if(myLema[0].indexOf(",")!=-1){
+
+      _a=myLema[0].split(",")
+
+      console.log(",")
+
+      wiki[x][0]=_a[0];
+
+
+      //myLema=myLema.shift();
+      wiki[x][1]=myLema.join(".");
+      x++;
+
+    }else{
+      wiki[x][0]=myLema[0];
+
+
+      //myLema=myLema.shift();
+      wiki[x][1]=myLema.join(".");
+      x++;
+
+    }
+
+   
+    //console.log(wiki[x][0]);
+  }
+
+  console.log(wiki.length)
+}
+
+
+//gif dir load
+fd="";
+var arrayDirs=[];
+
+
+
+arrayImagesGif=[];
+arrayImagesNamesGif=[];
+// fd=""; 
+xxx=0; 
+
+
+function loadDirImagesGif(){
+  fs4.readdir('images/gif/', (err, dir) => {
+
+   
+
+   xxx=0;
+   arrayImagesGif=[];
+
+  
+  for (var i = 0, path; path = dir[i]; i++) {
+
+
+    //console.log(""+path.indexOf("."));
+    if(path.indexOf(".")!=0 || path.indexOf(".jpg")!=-1 || path.indexOf(".png")!=-1  || path.indexOf(".jpeg")!=-1 || path.indexOf(".gif")!=-1 || path.indexOf(".bmp")!=-1){
+      //console.log(`images/${fd}/${path}`)
+     
+      arrayImagesGif[xxx]=`images/gif/${path}`;
+      xxx++;
+    }
+    //if(i==10) break;
+  }
+   // console.log(arrayImages1)
+  arrayImagesGif=_.shuffle(arrayImagesGif);
+
+  for(i=0;i<arrayImagesGif.length;i++){
+
+    //arrayImagesNames[i]=arrayImages[i].split("//")[1].charAt(0);
+  }
+
+  //console.log(arrayImagesGif)
+
+ // console.log(arrayImages)
+ // console.log(arrayImagesNames)
+});
+}
+
+loadDirImagesGif();
+
+fd="";
+var arrayDirs=[];
+
+fs.readdir('images/', (err, dir) => {
+   sel=`<select id="img-select" onchange="openFiles(this.value);">
+    <!--<option value="-1">random</option>-->
+
+   `;
+   bFirstDir=0;
+   fd="";
+   arrayDirs=[]; z=0;
+    for (var i = 0, path; path = dir[i]; i++) {
+
+     
+
+      //console.log(""+path.indexOf("."));
+      if(path.indexOf(".")!=0){
+        if(!bFirstDir){
+          bFirstDir=1;
+          fd=path;
+
+        }
+        sel+=`<option value="${path}">`+(path)+`</option>`;
+        arrayDirs[z]=path; z++;
+      }
+    }
+    sel +="</select>";
+    fd=arrayDirs[0];
+    fd="_life";
+
+    $("#mySelect").html(sel);
+
+    loadDirImages();
+
+    return;
+
+    fs.readdir('images/'+fd, (err, dir) => {
+    
+    img="";
+    for (var i = 0, path; path = dir[i]; i++) {
+
+      //console.log(""+path.indexOf("."));
+      if(path.indexOf(".")!=0){
+       
+        img+=`<img src="images/${fd}/${path}">`;
+      }
+      if(i==10) break;
+    }
+    
+
+    $("#images-div").html(img);
+ });
+});
+
+function openFiles(fdx){
+  fd=fdx;
+  loadDirImages();
+}
+
+arrayImages=[];
+arrayImagesNames=[];
+// fd=""; 
+xx=0; 
+
+
+
+
+function loadDirImages(){
+  fs.readdir('images/'+fd, (err, dir) => {
+
+   console.log(fd); 
+
+   xx=0;
+   arrayImages=[];
+  
+  for (var i = 0, path; path = dir[i]; i++) {
+
+
+    //console.log(""+path.indexOf("."));
+    if(path.indexOf(".")!=0 || path.indexOf(".jpg")!=-1 || path.indexOf(".png")!=-1  || path.indexOf(".jpeg")!=-1 || path.indexOf(".gif")!=-1 || path.indexOf(".bmp")!=-1){
+      //console.log(`images/${fd}/${path}`)
+     
+      arrayImages[xx]=`images/${fd}/${path}`;
+      xx++;
+    }
+    //if(i==10) break;
+  }
+   // console.log(arrayImages1)
+  arrayImages=_.shuffle(arrayImages);
+  /*
+  library[];
+
+  for(i=0;i<arrayImages.length;i++){
+
+    all_img=arrayImages[i].split("/")[2].split("_");
+
+    library
+
+    //arrayImagesNames[i]=arrayImages[i].split("//")[1].charAt(0);
+  }
+*/
+
+
+ // console.log(arrayImages)
+ // console.log(arrayImagesNames)
+});
+
+
+}
+
+////////////
+// load emoji
+////////////
+
+arrayImages6=[];
+arrayImagesNames6=[];
+// fd=""; 
+xx6=0; 
+
+fd6="emomix";
+fd6="_life";
+//fd6="fe";
+//fd6="places";
+// fd6="emomix2";
+
+
+function loadDirImages6(){
+  fs3.readdir('images/'+fd6, (err, dir) => {
+
+
+
+   xx6=0;
+   arrayImages6=[];
+
+  
+  for (var i = 0, path; path = dir[i]; i++) {
+
+
+    //console.log(""+path.indexOf("."));
+    if(path.indexOf(".")!=0 || path.indexOf(".jpg")!=-1 || path.indexOf(".png")!=-1  || path.indexOf(".jpeg")!=-1 || path.indexOf(".gif")!=-1 || path.indexOf(".bmp")!=-1){
+      //console.log(`images/${fd}/${path}`)
+     
+      arrayImages6[xx6]=`images/${fd6}/${path}`;
+      xx6++;
+    }
+    //if(i==10) break;
+  }
+   // console.log(arrayImages1)
+  arrayImages6=_.shuffle(arrayImages6);
+
+  for(i=0;i<arrayImages6.length;i++){
+
+    //arrayImagesNames[i]=arrayImages[i].split("//")[1].charAt(0);
+  }
+
+  //console.log(arrayImages6)
+
+
+ // console.log(arrayImages)
+ // console.log(arrayImagesNames)
+});
+}
+
+loadDirImages6();
+
+
+///////////
+//load texts
+////////////
+
+fd2="";
+var arrayDirs2=[];
+
+fs.readdir('texts/', (err, dir) => {
+   sel=`<select id="img-select2" onchange="stopFlash(); loadText(this.value);" style="width:150px; display:none;">
+    <!--<option value="-1">random</option>-->
+
+   `;
+   bFirstDir=0;
+   fd2="";
+   arrayDirs2=[]; z=0;
+    for (var i = 0, path; path = dir[i]; i++) {
+
+     
+
+      //console.log(""+path.indexOf("."));
+      if(path.indexOf(".")!=0){
+        if(!bFirstDir){
+          bFirstDir=1;
+          fd2=path;
+
+        }
+        sel+=`<option value="${path}">`+(path)+`</option>`;
+        arrayDirs[z]=path; z++;
+      }
+    }
+    sel +="</select>";
+    //fd2=arrayDirs[0];
+
+    $("#mySelect2").html(sel);
+    $("#img-select2").val("hp3.txt")
+    $("#img-select2").val("experimento.txt")
+
+    loadText("hp3.txt");
+    //loadText("rae.txt");
+
+    return;
+
+    fs.readdir('images/'+fd, (err, dir) => {
+    
+    img="";
+    for (var i = 0, path; path = dir[i]; i++) {
+
+      //console.log(""+path.indexOf("."));
+      if(path.indexOf(".")!=0){
+       
+        img+=`<img src="images/${fd}/${path}">`;
+      }
+      if(i==10) break;
+    }
+    
+
+    $("#images-div").html(img);
+ });
+});
+
+
+var arrayPages=[];
+countPages=0;
+var myFileName="";
+
+function loadText(fdx){
+
+    $("#img-select2").val(fdx)
+
+
+    if(parseInt(fdx)==-1){
+      fd2=arrayDirs[_.random(0,arrayDirs.length-1)];
+
+    }else{
+      fd2=fdx;
+
+    }
+
+   // const fs = require("fs");
+
+    // // Asynchronous read
+    // fs.readFile(fd, function (err, data) {
+    //   if (err) {
+    //     return console.error(err);
+    //   }
+    //   console.log("Asynchronous read: " + data.toString());
+    // });
+
+    // Synchronous read
+    myFile = fs.readFileSync("texts/"+fdx);
+    // console.log(myFile+"")
+    myTxt=myFile+"";
+    myFileName=fdx.split(".")[0];
+    console.log(myFileName)
+    //console.log(myTxt.length)
+
+
+    arrayPages=[];
+
+    sel=`<select id="img-select3" onchange="stopFlash(); loadPage(this.value);">`;
+    
+    xx=0;
+    countPages=0;
+    currentPage="";
+    bChangePage=0;
+
+    for(let i=0;i<myTxt.length;i++){
+      currentPage+=myTxt.charAt(i);
+
+      tamano_page=10000; //!important
+      tamano_page=1500; //!important
+      if(xx%tamano_page==0 && xx!=0) bChangePage=1;
+      
+
+      // if(xx%10000==0 && xx!=0){
+      if(myTxt.charAt(i)==" " && bChangePage){
+
+        bChangePage=0;
+
+        arrayPages[countPages]=currentPage;
+        //console.log(currentPage)
+    
+        sel+=`<option value="${countPages}">`+countPages+`</option>`;
+        countPages++;
+        currentPage="";
+       
+       }
+
+        xx++;
+
+    }
+
+     arrayPages[countPages]=currentPage;
+        //console.log(currentPage)
+     sel+=`<option value="${countPages}">`+countPages+`</option>`;
+    
+
+    sel +="</select>";
+
+
+    $("#mySelect3").html(sel);
+
+    loadPage(0);
+
+}
+
+
+currentPageGlobal=0;
+emotions=[];
+
+function loadPage(x){
+
+  currentPageGlobal=x;
+  $("#img-select3").val(x)
+  txt=arrayPages[x];
+
+  if(bCuentas){
+
+     emotions=[];
+    //console.log(window.memoriaM4.length)
+
+    for(i=0;i<window.memoriaM4.length;i++){
+      emotions[i]=window.memoriaM4[i].split("/")[2].split(".")[0];
+      //console.log(emotions[i])
+    }
+
+    //configuración cuentas 
+
+    max_cuentas=9;
+    min_cunetas=1;
+    array_operaciones=["+","-","*","/"];
+    selected_operation=0;
+
+    txtArray=txt.split(" ");
+
+    cantidad_intercalar=7;
+
+    cantidad_elementos=3;
+    cantidad_elementos_logica=2;
+
+    operadores_logicos=["∧","∨","⊕","⇒","⇔"];
+    operadores_verdad=["V","F"];
+
+    poner="";
+    for(i=0;i<txtArray.length;i++){
+
+      tipo_operacion=_.random(0,2)
+
+      poner+=txtArray[i]+" ";
+
+      if(tipo_operacion==0){
+         if(i%cantidad_intercalar==0 && i!=0){
+
+            for(j=0;j<cantidad_elementos;j++){
+              poner+=_.random(min_cunetas,max_cuentas)
+
+              if(j!=cantidad_elementos-1) poner+=array_operaciones[selected_operation];
+            }
+            poner+=" ";
+            //poner+=_.random(min_cunetas,max_cuentas)+""+array_operaciones[selected_operation]+""+_.random(min_cunetas,max_cuentas)+" ";
+          }
+      }
+
+      if(tipo_operacion==1){
+
+          if(i%cantidad_intercalar==0 && i!=0){
+
+            for(j=0;j<cantidad_elementos_logica;j++){
+              poner+=operadores_verdad[_.random(0,1)];
+
+              if(j!=cantidad_elementos_logica-1) poner+=operadores_logicos[_.random(0,operadores_logicos.length-1)];
+            }
+            poner+=" ";
+            //poner+=_.random(min_cunetas,max_cuentas)+""+array_operaciones[selected_operation]+""+_.random(min_cunetas,max_cuentas)+" ";
+          }
+
+
+      }//tipo_operacion
+
+      if(tipo_operacion==2){
+
+          if(i%cantidad_intercalar==0 && i!=0){
+
+             articulos = window.articulos;
+            sustantivos = window.sustantivos;
+            adjetivos = window.adjetivos;
+
+             bien = _.random(0, 1);
+            resultado = bien;
+            tipoFrase = _.random(0, 3);
+            maxArticulos = 3;
+            maxSustantivos = 23;
+            maxAdjetivos = 17;
+            selectArt = tipoFrase;
+            selectSust = _.random(0, maxSustantivos);
+            selectAdj = _.random(0, maxAdjetivos);
+            art = "";
+            sust = "";
+            adj = "";
+            cantidadErrores = 0;
+            dondeError = _.random(0, 2);
+
+              if (bien) {
+                art = articulos[selectArt][_.random(0, 1)];
+                sust = sustantivos[selectSust][selectArt];
+                adj = adjetivos[selectAdj][selectArt];
+              } else {
+                while (true) {
+                  selectArt2 = _.random(0, 3);
+                  if (dondeError = 1) {
+                    break;
+                  }
+                  if (selectArt2 !== selectArt) {
+                    break;
+                  }
+                }
+                while (true) {
+                  selectArt3 = _.random(0, 3);
+                  if (dondeError = 0) {
+                    break;
+                  }
+                  if (selectArt3 !== selectArt) {
+                    break;
+                  }
+                }
+                art = articulos[selectArt][_.random(0, 1)];
+                sust = sustantivos[selectSust][selectArt2];
+                adj = adjetivos[selectAdj][selectArt3];
+              }
+
+            
+            poner+=art+"_"+sust//+"_"+adj;
+            poner+=" ";
+            //poner+=_.random(min_cunetas,max_cuentas)+""+array_operaciones[selected_operation]+""+_.random(min_cunetas,max_cuentas)+" ";
+          }
+      }//tipo_operacion
+
+      if(tipo_operacion==3){
+
+         poner+=emotions[_.random(0,emotions.length-1)]+" ";
+      }
+      
+
+     
+    }//for
+
+
+
+    txt=poner;
+
+  }
+
+  $("#input1").val(txt)
+
+}
+
+//loadText();
+
+
+
+
+
+bLoop=1;
+
+repeatQ=0;
+loopBuffer=0;
+repeatCount=0;
+bRepetir=0;
+nextRepeat=0;
+gotoPrev=0;
+
+function changeMargin(){
+  newMargin = $("#margin-text").val()+"px";
+  $("#left-screen").css("left",newMargin);
+  $("#right-screen").css("right",newMargin);
+}
+
+letras_emo="abcdefghilmnopqrstuv".split("");
+
+for(i=0;i<letras_emo.length;i++){
+  cara = letras_emo[i];
+  if(cara=="a" || cara=="e"  || cara=="n" || cara=="o"  || cara=="r"  || cara=="s"){
+    for(j=1;j<5;j++){
+     // $("#preload").append(`<img src="emociones/${cara+j}.gif">`);
+
+    }
+  }else{
+   // $("#preload").append(`<img src="emociones/${cara}.gif">`);
+  }
+
+}
+
+bHide=0;
+
+function hide(){
+  bHide=!bHide;
+
+  if(bHide){
+    $("#hide-btn").val("show");
+    $("#control").hide();
+
+  }else{
+
+    $("#hide-btn").val("hide");
+    $("#control").show();
+  }
+}
+
+velocity=300;
+txtLength=0;
+
+myExperiment=1;
+
+function random_color(format)
+{
+    var rint = Math.round(0xffffff * Math.random());
+    switch(format)
+    {
+        case 'hex':
+            return ('#0' + rint.toString(16)).replace(/^#0([0-9a-f]{6})$/i, '#$1');
+            break;
+
+        case 'rgb':
+            return 'rgb(' + (rint >> 16) + ',' + (rint >> 8 & 255) + ',' + (rint & 255) + ')';
+            break;
+
+        default:
+            return rint;
+            break;
+    }
+}
+/*
+function getRandomColor() {
+    var letters = '0123456789ABCDEF';
+    var color = '#';
+    for (var i = 0; i < 6; i++ ) {
+        color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
+}
+*/
+bRc=0;
+
+function n(x){ return parseInt($("#"+x).val()); }
+
+var bPlay=0;
+var wordsByFlash=1;
+var readingMode=6;
+var circleFase=0;
+var bCW=0;
+bColors=0;
+fontSize=30;
+
+images_per_word=[];
+array_color=[];
+
+//!important manejo gif #gif
+bGif=1; 
+bLoadedGif=0;
+
+audioChannel=0;
+
+perfect_word=[];
+
+function play(){
+
+  $("#center-screen").css("width",$(window).width());
+
+  bPlay=!bPlay;
+
+  if(bPlay){
+    $("#play-btn").val("pause");
+
+    init(1);
+
+  }else{
+    clearTimeout(killInterval);
+    clearTimeout(killIntervalRc);
+    $("#play-btn").val("start");
+  }
+}
+
+
+ww=$(window).width();
+wh=$(window).height();
+
+var cadena;
+var cantidad;
+var posicion=0;
+var lugar="left-screen";
+var killInterval;
+
+bLugar=1;
+iniciar = 1;
+tiempo = 0;
+
+lugar = "";
+mostrar="";
+
+var killIntervalRc;
+
+var cantidadImagenesTotal=0;
+
+
+function calcularTiempo(){
+  if(iniciar==0){
+    tiempo = ( cantidad - posicion ) * ( 60000/n("velocityFlash") );
+
+    poner = `${posicion+1}/${cantidad}[${cantidadImagenesTotal}] - ${getDuration(tiempo)}`;
+    $("#stats").html(poner);
+
+  }
+}
+
+var kill6;
+var strToCopy="";
+
+
+function preloadImages(x,y){
+
+  return;
+
+
+  console.log("preloadImages")
+
+  for(i=0;i<(x-1);i++){ $("#p-e-"+i).remove(); }
+  
+  if(x==0) aumentoCargar=0; 
+  // if(x==0) cantidadCargar=100; 
+  
+  for(i=(x+aumentoCargar);i<(x+cantidadCargar);i++){
+
+    $("preload").append(`
+      <div id="p-e-${i}">${cadena[i]}</div>
+    `);
+
+  }
+
+  aumentoCargar=50;
+  cantidadCargar=100;
+
+}
+
+//preloading deprecated
+
+proximoCargar=0;
+cantidadCargar=100;
+aumentoCargar=50;
+
+function splitString(str) {
+    var middle = Math.ceil(str.length / 2);
+    var s1 = str.slice(0, middle);
+    var s2 = str.slice(middle);
+    return s1 + " " + s2;
+};
+
+animation_system=0; //image animations (zoom,rotation...)
+
+//text info arrays
+
+array_palabras=[];
+array_palabras1=[];
+array_img=[];
+count_img=0;
+array_sin_img=[];
+repeatWW=0;
+array_img_simple=[];  
+array_img_count=[]; 
+
+//agrupation images
+contadorImgMostrar=0;
+textoMostrar="";
+contadorPalabras=0;
+bPiano=0;
+
+arrayImagesPreload=[];
+
+array_img_swap=[];
+array_text_swap=[];
+
+
+function init(x){
+
+  if(iniciar==1){
+
+    
+
+    audioChannel=n("audioChannel");
+
+    perfect_word=[];
+
+   
+     if(audioChannel==0){
+      bPiano=0;
+      bTts=0;
+
+     }
+
+    if(audioChannel==1){
+      bPiano=1;
+      bTts=0;
+    }
+    if(audioChannel==2){
+      bTts=1;
+      bPiano=0;
+      
+    }
+
+    zPreload=0;
+    arrayImagesPreload=[];
+
+    //image agrupation
+    contadorImgMostrar=0;
+    textoMostrar="";
+    contadorPalabras=0;
+
+    n_mostrar=-1;
+
+    ww=$(window).width();
+    //alert();
+    var limpia = "";
+    resultados = "";
+    cantidadPalabras = 0;
+    repeatWW=n("repeat-w");
+    myDb=n("database");
+
+    str = $("#input1").val();
+
+    animation_system=n("animation");
+
+    array_color=[];
+    array_img=[];
+
+    array_palabras=[];
+    array_palabras1=[];
+
+
+    //cleaning text
+
+    limpia = str.split("\n").join(" ");
+    limpia = limpia.split("\t").join(" ");
+    limpia = limpia.split("\r").join(" ");
+    limpia = limpia.split(",").join(" ");
+    limpia = limpia.split(".").join(" ");
+    limpia = limpia.split(")").join(" ");
+    limpia = limpia.split("(").join(" ");
+    limpia = limpia.split(";").join(" ");
+    limpia = limpia.split(":").join(" ");
+    limpia = limpia.split("-").join(" ");
+    limpia = limpia.split("ñ").join("nn");
+    limpia = limpia.split("”").join(" ");
+    limpia = limpia.split("“").join(" ");
+    limpia = limpia.split("—").join(" ");
+    limpia = limpia.split("«").join(" ");
+    limpia = limpia.split("«").join(" ");
+    limpia = limpia.split("»").join(" ");
+    limpia = limpia.split("‘").join(" ");
+    limpia = limpia.split("...").join(" ");
+    limpia = limpia.split("…").join(" "); // 3 puntos en un solo bloque 
+    limpia = limpia.split("\"").join(" ");
+    limpia = limpia.split("–").join(" ");
+    limpia = limpia.split("'").join(" ");
+    limpia = limpia.split("¡").join(" ");
+    limpia = limpia.split("!").join(" ");
+    limpia = limpia.split("¿").join(" ");
+    limpia = limpia.split("?").join(" ");
+    limpia = limpia.split("ü").join("u");
+    limpia = limpia.split(">").join(" ");
+
+    images_per_word=[];
+    array_sin_img=[];
+
+
+    //palabras cortas
+
+    // limpia = limpia.split("más").join("+");
+    // limpia = limpia.split("mas").join("+");
+    // limpia = limpia.split("qué").join("q");
+    // limpia = limpia.split("que").join("q");
+    // limpia = limpia.split("por").join("x");
+    // limpia = limpia.split("cada").join("c/");
+    // limpia = limpia.split("de").join("d");
+
+    //llimpia = limpia.replaceArray(["de ","en ","el ","la ","las ","y ","un ","los "]," ");
+
+    if(wordsByFlash==1){
+      
+      /*
+      _a = ["De "," de "," en ","El "," el ","La ", " la ", "Las ", " las "," y "," un "," los "," con ","A "," a "," al "," que "," lo "," por "," tras "," desde "," hacia "," entre "," durante "," hasta ", " por ", "Por "];
+
+      for (i=0;i<_a.length;i++) {
+        //console.log(val)
+        limpia = limpia.split(_a[i]).join(" ");
+
+      }
+      */
+    }
+   
+
+    limpia = limpia.split("   ").join(" ");
+    limpia = limpia.split("  ").join(" ");
+
+    if(limpia.length<200){
+
+      x=limpia;
+      s="";
+      for(i=0;i<100;i++){
+        s+=" "+x;
+      }
+      limpia=s;
+    }
+
+    str = limpia;
+    
+    cadena=str.split(" ");
+
+    cantidad=cadena.length;
+    posicion = 0;
+
+    // console.log(cadena)
+    // console.log(repeatWW)
+
+    // strDatabase1=$("#txt-1").html();
+    // cadenaDatabase1=strDatabase1.split("\n");
+
+    // strDatabase2=$("#txt-2").html();
+    // cadenaDatabase2=strDatabase2.split("\n");
+
+    // strDatabase3=$("#txt-3").html();
+    // cadenaDatabase3=strDatabase3.split("\n");
+
+    //  strDatabase4=$("#txt-4").html();
+    // cadenaDatabase4=strDatabase4.split("\n");
+
+    // strDatabase5=$("#txt-5").html();
+    // cadenaDatabase5=strDatabase5.split("\n");
+
+    // strDatabase6=$("#txt-6").html();
+    // cadenaDatabase6=strDatabase6.split("\n");
+
+    // console.log(cadenaDatabase1)
+    // console.log(cadenaDatabase2)
+    // console.log(cadenaDatabase3)
+
+    collision=n("collision");
+
+    myDb=8;
+    //cadena=[];
+
+    contador=0;
+
+    //console.log(arrayImages)
+
+    console.log("words: "+cadena.length)
+    cadena2=[];
+
+    indexC=0;
+
+    arrayLength=[];
+    _palabra3="";
+
+    _main_image="";
+
+    count_img=0;
+    i_sin=0;
+
+    place_i=1;
+    //for(i=0;i<500/*cadena.length*/;i++){
+    for(i=0;i<cadena.length;i++){
+
+      posibilidadIntecalar=_.random(1,100);
+
+      porcentajeIntercalar=100;
+
+      cantidadIntercalarEstatica=n("repeat-w");
+
+      cantidadIntercalar=cantidadIntercalarEstatica;
+
+      bIntercalar=0; 
+
+      if(cantidadIntercalarEstatica>1) bIntercalar=1;
+
+      if(posibilidadIntecalar>porcentajeIntercalar) cantidadIntercalar=1;
+      if(!bIntercalar) cantidadIntercalar=1;
+
+      for(k=0;k<cantidadIntercalar;k++){
+
+        contadorImagenes=0;  
+
+        tam_imagen_w=421.0+"";
+        tam_imagen_h=420.0+"";
+
+
+        //!
+        //tam_imagen_w=531.0+"";
+        //tam_imagen_h=530.0+"";
+
+        _myImg=`<img src="img_trans.gif" width="${tam_imagen_w}" height="${tam_imagen_h}">`;
+        _myImg1=`<img src="img_trans.gif" width="${tam_imagen_w}" height="${tam_imagen_h}">`;
+        _myImg2=`<img src="img_trans.gif" width="${tam_imagen_w}" height="${tam_imagen_h}">`;
+        _myImg3=`<img src="img_trans.gif" width="${tam_imagen_w}" height="${tam_imagen_h}">`;
+
+        _palabra = quitaAcentos(cadena[i].toLowerCase().split(" ").join(""));      
+        _palabra1 = cadena[i].toLowerCase().split(" ").join("");      
+        _palabra3 = _palabra;
+        array_palabras[i]= _palabra;
+        array_palabras1[i]= _palabra1;
+        //if(k>0) array_palabras[i]= "";
+        v = `[/_]${_palabra}\[0-9]*[._]`;
+        re = new RegExp (v,"g");
+
+        //if(k%2==1){
+          /*
+        if(k>0){
+
+          //myX=arrayImages6[_.random(0,arrayImages6.length-1)];
+           myX=arrayImages[_.random(0,arrayImages.length-1)];
+
+          //console.log(myX);
+          _palabra = myX;    
+          _palabra1 = myX;  
+          //v = `[/_]${_palabra}\[0-9]*[._]`;
+          v=myX;
+          //v=_palabra3;
+          re = new RegExp (v,"g");
+
+        }*/
+
+        bNoEncontrado=1;
+
+        for(kk=0;kk<dictionary.length;kk++){
+
+         break;
+        
+            //pal=getCleanedString(dictionary[k][0]);
+            //pal1=getCleanedString(arrayPalabras[i]);
+            //p=arrayPalabras[i].toLowerCase();
+
+            //if(dictionary[k][0]==p || dictionary[k][0]+"s"==arrayPalabras[i].toLowerCase() || dictionary[k][0]+"es"==arrayPalabras[i].toLowerCase()){
+            if(dictionary[kk][0].toLowerCase()==_palabra /*|| dictionary[k][0]+"s"==p || dictionary[k][0]+"es"==p  || dictionary[k][0]+"mente"==p*/){
+            //if(pal==pal1 || pal+"es"==pal1){
+              array_color[i]=dictionary[kk][1];
+              bNoEncontrado=0;
+              break;
+            // 
+            }  
+          }
+
+        if(bNoEncontrado) array_color[i]=getRandomColor();
+
+        bLoadedGif=0;
+
+        if(bGif){
+
+          for(j=0;j<arrayImagesGif.length;j++){
+
+            // _myImg="";
+            // if( arrayImages[j].split("ñ").join("n").indexOf("/"+quitaAcentos(cadena[i].toLowerCase().split(" ").join("").split("ñ").join("n") )+".") !=-1 /*&& cadena[i].length>=3*/ ){
+            if( 
+                // arrayImages[j].indexOf("/"+quitaAcentos( cadena[i].toLowerCase().split(" ").join("") )+".") !=-1 /*&& cadena[i].length>=3*/ ||
+                // arrayImages[j].indexOf("/"+quitaAcentos( cadena[i].toLowerCase().split(" ").join("") )+"_") !=-1 /*&& cadena[i].length>=3*/ ||
+                // arrayImages[j].indexOf("_"+quitaAcentos( cadena[i].toLowerCase().split(" ").join("") )+"_") !=-1 /*&& cadena[i].length>=3*/ 
+                
+                ( _palabra.length>2 || ( _palabra1=="id" || _palabra1=="eh" ||  _palabra1=="él" ||   _palabra1=="4" || _palabra1=="yo" || _palabra1=="ya" || _palabra1=="sí" || _palabra1=="té" || _palabra=="no" || _palabra=="ay" || _palabra=="ir" || _palabra=="va" || _palabra=="ah"  || _palabra=="he"  || _palabra=="ha"  || _palabra=="qué"  || _palabra=="tú"  || _palabra=="vi"  || _palabra=="ví" || _palabra=="oh" || _palabra=="es" || _palabra=="tú" || _palabra=="mi" || _palabra=="mí" || _palabra=="da"  || _palabra=="ni" ) ) 
+                && 
+                arrayImagesGif[j].search(re) !=-1 
+                && ( _palabra!="que" )
+
+                // arrayImages[j].search("/"+quitaAcentos( cadena[i].toLowerCase().split(" ").join("") )+"_") !=-1 /*&& cadena[i].length>=3*/ ||
+                // arrayImages[j].search("_"+quitaAcentos( cadena[i].toLowerCase().split(" ").join("") )+"_") !=-1 /*&& cadena[i].length>=3*/ 
+             ){
+              
+              bLoadedGif=1;
+              //console.log( contador +" "+cadena[i]+" "+arrayImages[j]);
+              //console.log( arrayImages[j].indexOf(cadena[i].toLowerCase() ) )
+
+              classImage="/*no-display2*/ ci"
+              
+              if(contadorImagenes==0){
+
+                array_img[count_img]=arrayImagesGif[j];
+                count_img++;
+
+                _velocity=1;
+                if(velocity>=200) _velocity=2.00;
+                if(velocity>=300) _velocity=3.00;
+                if(velocity>=400) _velocity=4.00;
+                if(velocity>=500) _velocity=5.00;
+
+                _velocity=5;
+                _velocity=7; //papa lo vio en 7
+
+                if(velocity)
+
+                _myImg=`<img src="${arrayImagesGif[j]}" width="${tam_imagen_w}" height="${tam_imagen_h}" class="${classImage} /*ge*/" style=" /*display: block;*/ /* clip:  rect(0, 100px, 200px, 50px);*/"  oncontextmenu="/*alert('${_palabra}');*/">`;
+
+                _myImg=`<x-gif src="${arrayImagesGif[j]}" style="width: ${tam_imagen_w}; height: ${tam_imagen_h};" width="${tam_imagen_w}" height="${tam_imagen_h}" speed="${_velocity}" id="gif-${i}" class="currentGif"></x-gif>`;
+
+
+                  /*
+                _myImg=`
+
+                 <img class="original" src="${arrayImagesGif[j]}" style="display:none;">
+
+                  <div id="image">
+                  
+                  <script>
+
+                   images = element.getElements('img.original').map(function(img) {
+                      return img.src;
+                  });
+
+                 
+
+                    var gif = new GIF({
+                      workers: 2,
+                      quality: 10
+                    });
+
+                    // add a image element
+                    for (j = 0, len = images.length; j < len; j++) {
+                      image = images[j];
+                      gif.addFrame(image, {
+                        delay: 500,
+                        copy: true
+                      });
+                    }
+                    //gif.addFrame(imageElement, {delay: 200});
+
+                    // or a canvas element
+                    //gif.addFrame(canvasElement, {delay: 200});
+
+                    // or copy the pixels from a canvas context
+                    //gif.addFrame(ctx, {copy: true});
+
+                    gif.on('finished', function(blob) {
+                      window.open(URL.createObjectURL(blob));
+                    });
+
+                    gif.render();
+                  <\/script>
+
+                  </div>
+                `;*/
+                
+                _myImg1=`<img src="${arrayImages[j]}" width="${tam_imagen_w}" height="${tam_imagen_h}" class="${classImage} /*ge*/" style="transform: scaleY(-1); /*display: block;*/">`
+                _myImg2=`<img src="${arrayImages[j]}" width="${tam_imagen_w}" height="${tam_imagen_h}" class="${classImage} /*ge*/" style="transform: scaleX(1); /*display: block;*/  /*display: block; margin-left: auto; margin-right: auto;*/">`
+                _myImg3=`<img src="${arrayImages[j]}" width="${tam_imagen_w}" height="${tam_imagen_h}" class="${classImage} /*ge*/" style="transform: scaleX(-1); /*display: block;*/ /*display: block; margin-left: auto; margin-right: auto;*/">`
+
+                if(k==0){
+
+                  _show="";
+                  if(repeatWW>0) _show="show1";
+
+                  _main_image=`<img src="${arrayImages[j]}" width="${421.0}" height="${490.0}" class="${classImage} ${_show} ci /*ge*/" style="/*display: block;*/ /* clip:  rect(0, 100px, 200px, 50px);*/" oncontextmenu="/*alert('${_palabra}');*/">`;
+
+                } 
+
+              }else{
+
+                myBr="";
+                if(readingMode==1) continue;
+                if(wordsByFlash>1) myBr="<br>";
+
+                array_img[count_img]=arrayImagesGif[j];
+                count_img++;
+
+                _myImg+=`${myBr}<img src="${arrayImagesGif[j]}" width="${tam_imagen_w}" height="${tam_imagen_h}" class="${classImage} /*ge*/"  style="/*display: block;*/  /*animation-name: example; animation-duration: 0.2s;*/">`;
+                //_myImg+=`<x-gif src="${arrayImagesGif[j]}" style="width: ${tam_imagen_w}; height: ${tam_imagen_h};" width="${tam_imagen_w}" height="${tam_imagen_h}"></x-gif>`;
+                _myImg1+=`<img src="${arrayImages[j]}" width="${tam_imagen_w}" height="${tam_imagen_h}" class="${classImage} /*ge*/" style="transform: scaleY(-1); /*display: block;*/">`
+                
+              }
+              
+              
+              contador++; contadorImagenes++;
+
+              //console.log ( i + " " + contadorImagenes +" "+ _palabra + " " + arrayImages[j] )
+
+            }  //if match dictionary    
+          }//for j arrayImagesGif
+        }
+
+
+        if(bLoadedGif==0){
+
+            for(j=0;j<arrayImages.length;j++){
+
+            // _myImg="";
+            // if( arrayImages[j].split("ñ").join("n").indexOf("/"+quitaAcentos(cadena[i].toLowerCase().split(" ").join("").split("ñ").join("n") )+".") !=-1 /*&& cadena[i].length>=3*/ ){
+            if( 
+                // arrayImages[j].indexOf("/"+quitaAcentos( cadena[i].toLowerCase().split(" ").join("") )+".") !=-1 /*&& cadena[i].length>=3*/ ||
+                // arrayImages[j].indexOf("/"+quitaAcentos( cadena[i].toLowerCase().split(" ").join("") )+"_") !=-1 /*&& cadena[i].length>=3*/ ||
+                // arrayImages[j].indexOf("_"+quitaAcentos( cadena[i].toLowerCase().split(" ").join("") )+"_") !=-1 /*&& cadena[i].length>=3*/ 
+                
+                ( _palabra.length>2 || ( _palabra1=="id" || _palabra1=="eh" ||  _palabra1=="él" ||   _palabra1=="4" || _palabra1=="yo" || _palabra1=="ya" || _palabra1=="sí" || _palabra1=="té" || _palabra=="no" || _palabra=="ay" || _palabra=="ir" || _palabra=="va" || _palabra=="ah"  || _palabra=="he"  || _palabra=="ha"  || _palabra=="qué"  || _palabra=="tú"  || _palabra=="vi"  || _palabra=="ví" || _palabra=="oh" || _palabra=="es" || _palabra=="tú" || _palabra=="mi" || _palabra=="mí" || _palabra=="da"  || _palabra=="ni" ) ) 
+                && 
+                arrayImages[j].search(re) !=-1 
+                && ( _palabra!="que" )
+
+                // arrayImages[j].search("/"+quitaAcentos( cadena[i].toLowerCase().split(" ").join("") )+"_") !=-1 /*&& cadena[i].length>=3*/ ||
+                // arrayImages[j].search("_"+quitaAcentos( cadena[i].toLowerCase().split(" ").join("") )+"_") !=-1 /*&& cadena[i].length>=3*/ 
+             ){
+              
+              //console.log( contador +" "+cadena[i]+" "+arrayImages[j]);
+              //console.log( arrayImages[j].indexOf(cadena[i].toLowerCase() ) )
+
+              classImage="/*no-display2*/ ci"
+              
+              if(contadorImagenes==0){
+
+                array_img[count_img]=arrayImages[j];
+                count_img++;
+
+                _myImg=`<img src="${arrayImages[j]}" width="${tam_imagen_w}" height="${tam_imagen_h}" class="${classImage} /*ge*/" style=" /*display: block;*/ /* clip:  rect(0, 100px, 200px, 50px);*/"  oncontextmenu="/*alert('${_palabra}');*/" onload="zPreload++; /*console.log(zPreload);*/ if(zPreload==_.uniq(arrayImagesPreload).length-1){ init(0); zPreload++; }">`;
+                _myImg1=`<img src="${arrayImages[j]}" width="${tam_imagen_w}" height="${tam_imagen_h}" class="${classImage} /*ge*/" style="transform: scaleY(-1); /*display: block;*/">`
+                _myImg2=`<img src="${arrayImages[j]}" width="${tam_imagen_w}" height="${tam_imagen_h}" class="${classImage} /*ge*/" style="transform: scaleX(1); /*display: block;*/  /*display: block; margin-left: auto; margin-right: auto;*/">`
+                _myImg3=`<img src="${arrayImages[j]}" width="${tam_imagen_w}" height="${tam_imagen_h}" class="${classImage} /*ge*/" style="transform: scaleX(-1); /*display: block;*/ /*display: block; margin-left: auto; margin-right: auto;*/">`
+
+                if(k==0){
+
+                  _show="";
+                  if(repeatWW>0) _show="show1";
+
+                  _main_image=`<img src="${arrayImages[j]}" width="${421.0}" height="${490.0}" class="${classImage} ${_show} ci /*ge*/" style="/*display: block;*/ /* clip:  rect(0, 100px, 200px, 50px);*/" oncontextmenu="/*alert('${_palabra}');*/">`;
+
+                } 
+
+              }else{
+
+                myBr="";
+                if(readingMode==1) continue;
+                if(wordsByFlash>1) myBr="<br>";
+
+                array_img[count_img]=arrayImages[j];
+                count_img++;
+
+                _myImg+=`${myBr}<img src="${arrayImages[j]}" width="${tam_imagen_w}" height="${tam_imagen_h}" class="${classImage} /*ge*/"  style="/*display: block;*/  /*animation-name: example; animation-duration: 0.2s;*/">`;
+                _myImg1+=`<img src="${arrayImages[j]}" width="${tam_imagen_w}" height="${tam_imagen_h}" class="${classImage} /*ge*/" style="transform: scaleY(-1); /*display: block;*/">`
+                
+              }
+              
+              
+              contador++; contadorImagenes++;
+
+              //console.log ( i + " " + contadorImagenes +" "+ _palabra + " " + arrayImages[j] )
+
+            }  //if match dictionary    
+          }//for j arrayImages
+
+        }//bLoadedGif
+
+        if( bLoadedGif==0 ) arrayImagesPreload[i]=_myImg;
+
+        array_img_count[i]=contadorImagenes;
+
+        if(contadorImagenes==0 && _palabra.length>2  && _palabra!="que"  && _palabra!="las"  && _palabra!="los"  && _palabra!="les"  && _palabra!="nos"  && _palabra!="con"  && _palabra!="del"  && _palabra!="tan"  && _palabra!="sus" ){
+          array_sin_img[i_sin]=_palabra;
+          i_sin++;
+        }
+
+
+         if( (k>=0 /*&& _palabra3.length>3*/ && contadorImagenes>0 && cantidadIntercalarEstatica>0) || (bPlace && contadorImagenes>0 ) ){
+        //if(k>0 && contadorImagenes>0){
+
+            //console.log(_palabra)
+            classImage="/*no-display2*/ ci"
+
+          tam_imagen_w=421.0+"";
+          tam_imagen_h=490.0+"";
+
+          aa=_main_image; bb="";
+          // if(k>0){
+          //   if(_.random(0,1)){ aa=_main_image; bb=""; }else{ bb=_main_image; aa=""; }
+          // }
+          if(bPlace){
+            // _myImg=aa+`<img src="${arrayImages6[place_i]}" width="${tam_imagen_w}" height="${tam_imagen_h}" class="${classImage} /*ge*/" style="/*display: block;*/ /* clip:  rect(0, 100px, 200px, 50px);*/">`+bb;
+            _myImg=aa+`<img src="images/places/${place_i}.png" width="${tam_imagen_w}" height="${tam_imagen_h}" class="${classImage}/*ge*/" style="/*display: block;*/ /* clip:  rect(0, 100px, 200px, 50px);*/">`+bb;
+            place_i++;
+
+            // if(place_i==arrayImages6.length-2) place_i=1;
+            if(place_i==10) place_i=1;
+
+          }else{
+            _myImg=aa+`<img src="${arrayImages6[_.random(0,arrayImages6.length-1)]}" width="${tam_imagen_w}" height="${tam_imagen_h}" class="${classImage} show2 /*ge*/" style="/*display: block;*/ /* clip:  rect(0, 100px, 200px, 50px);*/">`+bb;
+
+          }
+          
+          // _myImg=_main_image+`<img src="${arrayImages6[_.random(0,arrayImages6.length-1)]}" width="${tam_imagen_w}" height="${tam_imagen_h}" class="${classImage} /*ge*/" style="/*display: block;*/ /* clip:  rect(0, 100px, 200px, 50px);*/">`;
+
+          contador++; contadorImagenes++;
+
+
+        }//if k>=0
+
+
+
+        images_per_word[i]=contadorImagenes;
+
+
+        _myImg+="<br>";
+
+
+        _fontSize="64px";
+        //!
+        //_fontSize="36px";
+
+        if(contadorImagenes>=2 && wordsByFlash==1){ _myImg = _myImg.split(tam_imagen_w).join(tam_imagen_w*0.8); }
+        if(contadorImagenes>=3 && wordsByFlash==1){ _myImg = _myImg.split(tam_imagen_w).join(tam_imagen_w*0.6); }
+
+        if(wordsByFlash==2){ _myImg = _myImg.split(tam_imagen_w).join(tam_imagen_w*0.6); _myImg = _myImg.split(tam_imagen_h).join(tam_imagen_h*0.6); }
+        if(wordsByFlash==3){ _myImg = _myImg.split(tam_imagen_w).join(tam_imagen_w*0.55); _myImg = _myImg.split(tam_imagen_h).join(tam_imagen_h*0.55); }
+        if(wordsByFlash==4){ _myImg = _myImg.split(tam_imagen_w).join(tam_imagen_w*0.5); _myImg = _myImg.split(tam_imagen_h).join(tam_imagen_h*0.5); }
+        if(wordsByFlash==5){ _myImg = _myImg.split(tam_imagen_w).join(tam_imagen_w*0.45); _myImg = _myImg.split(tam_imagen_h).join(tam_imagen_h*0.45); }
+        if(wordsByFlash==6){ _myImg = _myImg.split(tam_imagen_w).join(tam_imagen_w*0.40); _myImg = _myImg.split(tam_imagen_h).join(tam_imagen_h*0.40); }
+        if(wordsByFlash==7){ _myImg = _myImg.split(tam_imagen_w).join(tam_imagen_w*0.4); _myImg = _myImg.split(tam_imagen_h).join(tam_imagen_h*0.4); }
+        if(wordsByFlash>=8 && wordsByFlash<=12){ _myImg = _myImg.split(tam_imagen_w).join(tam_imagen_w*0.4); _myImg = _myImg.split(tam_imagen_h).join(tam_imagen_h*0.4); }
+        if(wordsByFlash==13){ _myImg = _myImg.split(tam_imagen_w).join(tam_imagen_w*0.4); _myImg = _myImg.split(tam_imagen_h).join(tam_imagen_h*0.4); }
+        if(wordsByFlash==14){ _fontSize="28 px"; _myImg = _myImg.split(tam_imagen_w).join(tam_imagen_w*0.38); _myImg = _myImg.split(tam_imagen_h).join(tam_imagen_h*0.38); }
+
+
+        if(wordsByFlash==1){
+
+          dism=0;
+          if(contadorImagenes>1) dism=contadorImagenes*0.3;
+          dismh=0;
+          if(contadorImagenes>1) dismh=contadorImagenes*0.15;
+
+          _myImg = _myImg.split(tam_imagen_w).join(tam_imagen_w*(1-dism)); /*_myImg = _myImg.split(tam_imagen_h).join(tam_imagen_h*(1-dismh));*/
+        }
+
+        myClass=""
+        /*if(n("velocityFlash")>=400) */ myClass="/*no-display*/" 
+        //if(_.random(1,100)<=n("hideWord") && _palabra.length>2 ) myClass="no-display";
+        //if(_.random(1,100)<=n("hideWord") ) myClass="no-display";
+        if(wordsByFlash>1) myClass="/*no-display*/"
+
+        cuenta=_.random(1,9)+"+"+_.random(1,9);
+        // cadena[i]="<center>"+_myImg+"<span class=\""+myClass+"\">"+cadena[i].split("nn").join("ñ")+"</span></center>";
+
+        // w=splitString(cadena[i].split("nn").join("ñ"));
+        // aw=w.split(" ");
+
+        bMuestra="/*display:none;*/";
+       
+
+        arrayLength[i]=cadena[i].split("nn").join("ñ").length;
+
+        _a_s="";
+        if(animation_system==2) _a_s="example"; //
+        if(animation_system==3) _a_s="example3"; //zoom
+        if(animation_system==4) _a_s="example5"; //zoom out
+        if(animation_system==5) _a_s="example8"; // only blur
+        if(animation_system==6) _a_s="example11"; // only blur
+        if(animation_system==7) _a_s="example13"; // only blur
+        if(animation_system==8) _a_s="example14"; // only blur
+        if(animation_system==9) _a_s="example15"; // gray scale color
+        if(animation_system==10) _a_s="example16"; // gray scale color
+        if(k>1) _a_s="example10"; // only blur and k>1
+
+        if(images_per_word[i]>1 && animation_system==1) _a_s="example4"; //zoom skew blur
+        if(images_per_word[i]>1 && animation_system==3) _a_s="example7"; //zoom in
+        if(images_per_word[i]>1 && animation_system==4) _a_s="example6"; //zoom out
+        if(images_per_word[i]>1 && animation_system==5) _a_s="example9"; //blur only
+        if(images_per_word[i]>1 && animation_system==6) _a_s="example12"; //blur only
+
+        if(animation_system==1) _a_s=""; 
+
+        if(k>0 && contadorImagenes==0){
+
+          //if(k==cantidadIntercalar-1) indexC++;
+
+          k=cantidadIntercalar-1;
+
+         continue;
+        }
+
+         _myImgWiki="";
+
+        if(bWiki){
+
+          //_palabra1
+
+          img_complement="";
+         
+          for(i4=0;i4<wiki.length;i4++){
+
+           // __v = `[/_]${_palabra}\[0-9]*[._]`;
+           // __re = new RegExp (__v,"g");
+
+            // if(_palabra==wiki[i4][0]){
+            //if(wiki[i4][0].search(__re) !=-1){
+          //if(_palabra=="señuelo") console.log(_palabra+"-"+wiki[i4][0])
+           if(_palabra==wiki[i4][0]){
+
+              //console.log(1);
+              texto_complement=wiki[i4][1];
+              texto_complement=limpiarTexto(texto_complement);
+              //console.log(texto_complement)
+              texto_a=texto_complement.split(" ");
+              texto_a=_.uniq(texto_a);
+
+              count_images_wiki=0;
+
+              for(i5=0;i5<texto_a.length;i5++){
+
+                  _pala = quitaAcentos(texto_a[i5].toLowerCase().split(" ").join(""));
+                  //_pala = texto_a[i5].toLowerCase().split(" ").join("");
+                  //console.log(_pala)
+                  _v = `[/_]${_pala}\[0-9]*[._]`;
+                  _v1 = `[/_]${_pala+"s"}\[0-9]*[._]`;
+                  
+                  _re = new RegExp (_v,"g");
+                  _re1 = new RegExp (_v1,"g");
+
+                  for(j4=0;j4<arrayImages.length;j4++){
+
+                    if(_pala.length<=3) break;
+
+                    //console.log(_pala)
+
+                    if(arrayImages[j4].search(_re) !=-1 || arrayImages[j4].search(_re1) !=-1){
+
+                      if(array_img[count_img]==arrayImages[j4]) continue;
+
+                      _myImgWiki+=`<img src="${arrayImages[j4]}" width="84" height="84" class="/*ge*/" style="/*float:left;*/" title="${_pala}">`;
+                      //console.log(_myImgWiki)
+                      count_images_wiki++;
+
+                      //break;
+
+                    }             
+                  }//j4
+
+                  //if(count_images_wiki>7) break;
+              }//i5
+            }//_palabra==
+          }//i4
+        }//bWiki
+
+        if(k>0){
+
+           cadena2[indexC]=`
+              <br>
+               <center>
+              <span class="${myClass} myTxt" style="${pos} font-size: ${_fontSize}; /*display:none;*/ /*background: linear-gradient(to bottom, black, black 50%, green 50%, green); -webkit-background-clip: text; -webkit-text-fill-color: transparent;*/ ${bMuestra}" id="txtFlash">${colored(_palabra1,array_color[i],array_color[i])} &nbsp; </span> <br>
+                <div class="anim" style="animation-name:  ${_a_s}; /*animation-duration: 0.2s;*/ animation-iteration-count: infinite; z-index: 1;">
+                ${_myImg}
+                </div>
+              </center>   
+          `;
+
+
+        }else{
+          //.charAt(0) 200918
+          //_after="";
+          //if(i>0) _after=arrayImagesPreload[i-1];
+          //_next=arrayImagesPreload[i+1];
+
+          perfect_word[i]=cadena[i].split("nn").join("ñ");
+
+          countSpace=0;
+          space = "";
+          for(_k=0;_k<countSpace;_k++) space+="&nbsp;";
+
+          left="";
+          right="";
+          if(i%2==0) left=space; else right=space;
+          
+
+          if(i%2==0) pos="float:right;"; else pos="float:left;"; 
+          pos="";
+
+           cadena2[indexC]=`
+
+           <br>
+
+           <!--
+            <center>   
+
+              <table style="vertical-align: middle;">
+              <tr>
+              <td valign="center" style="vertical-align: middle;">${_myImg2}</td>
+              <td>
+              <table>
+                <tr>
+                  <td></td><td>${_myImg1}</td><td></td> 
+                </tr>
+                <tr>
+                  <td></td>
+                  <td>
+                  <center>
+                    <span class="${myClass} myTxt" style="${pos} font-size: ${_fontSize}; /*display:none;*/ /*background: linear-gradient(to bottom, black, black 50%, green 50%, green); -webkit-background-clip: text; -webkit-text-fill-color: transparent;*/" id="txtFlash">${left+colored(cadena[i].split("nn").join("ñ"))+right}</span>
+                  </center>
+
+                  </td>
+                  <td></td> 
+                </tr>
+                <tr>
+                  <td></td><td>${_myImg}</td><td></td> 
+                </tr>
+
+              </table>  
+              </td>
+              <td valign="center"  style="vertical-align: middle;">${_myImg3}</td>
+              </tr>
+              </table>
+
+              -->
+
+              
+              
+           
+              <center>
+              <span class="${myClass} myTxt" style="${pos} font-size: ${_fontSize}; /*display:none;*/ /*background: linear-gradient(to bottom, black, black 50%, green 50%, green); -webkit-background-clip: text; -webkit-text-fill-color: transparent;*/ animation-name: example1; /*animation-duration: 0.2s;*/ animation-iteration-count: infinite;  z-index: 2; ${bMuestra}" id="txtFlash">@prevW${left+colored(cadena[i].split("nn").join("ñ"),array_color[i],array_color[i])+right}@nextW</span><br>
+                <div class="anim" style="animation-name:  ${_a_s}; /*animation-duration: 0.2s;*/ animation-iteration-count: infinite; z-index: 1;">
+                  <span id="img-2" style="zoom: 0.6;">@prev</span> &nbsp;
+                  <span id="img-1"> ${_myImg} </span>  &nbsp;
+                  <span id="img-3" style="zoom: 0.6;">@next</span>  &nbsp;
+                </div>
+                <br>
+                ${_myImgWiki}
+              </center>
+                    
+              
+              <!--<div id="texto" class="${myClass} myTxt" style="background-color: black; position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%); font-size: ${_fontSize}; opacity: 0.1; /*display:none;*/ ">
+
+
+                ${cadena[i].split("nn").join("ñ")}
+
+              </div>-->
+            </center>  
+          `;
+
+
+        }
+
+        /*
+
+        if(i>0){
+
+
+          _next=arrayImagesPreload[i];
+
+          //if(i>0) _after=arrayImagesPreload[i-1];
+          //_next=arrayImagesPreload[i+1];
+
+
+           cadena2[indexC-1]=cadena2[indexC-1].replace("@next",_next);
+
+          //_next=arrayImagesPreload[i+1];
+
+
+        }*/
+
+
+
+        indexC++;
+       
+        //cadena2[i]=`<span class="${myClass} myTxt"><!--${cuenta}-->${cadena[i].split("nn").join("ñ")}</span>`;
+
+
+        // cadena[i]=`
+        //   <center>
+
+        //     ${cadena[i].split("nn").join("ñ")}
+        //     <br style="clear: both;"> 
+            
+        //     <div style="float:left;"></div>
+        //     <div style="float:left;">${_myImg}</div>
+        //     <div style="float:left;"></div>
+        //     <br style="clear: both;"> 
+        //     ${cadena[i].split("nn").join("ñ")}
+        //   </center>  
+        // `;
+
+        if(_palabra.length<=2) break;
+
+      }//for k cantidadIntercalar
+
+    }//for i
+    console.log(contador)
+    cantidadImagenesTotal=contador;
+
+    cadena=_.extend(cadena2);
+    cantidad=cadena.length;
+
+    
+    preloadImages(proximoCargar,cantidadCargar);
+    proximoCargar+=aumentoCargar;
+    
+    
+    // for(i=0;i<cadena.length;i++){
+
+    //   if((cadena[i].length>3 && _.random(0,100)<=collision) ||  cadena[i].length>=10){
+    //     for(j=0;j<repeatWW;j++){
+    //       if(j%2==0){
+    //         for(;;){
+    //           if(myDb==1){ sel=cadena[_.random(0,cantidad-1)]; }
+    //           if(myDb==2){ sel=cadenaDatabase1[_.random(0,cadenaDatabase1.length-1)]; }
+    //           if(myDb==3){ sel=cadenaDatabase2[_.random(0,cadenaDatabase2.length-1)]; }
+    //           if(myDb==4){ sel=cadenaDatabase3[_.random(0,cadenaDatabase3.length-1)]; }
+    //           if(myDb==5){ sel=cadenaDatabase4[_.random(0,cadenaDatabase4.length-1)]; }
+    //           if(myDb==6){ sel=cadenaDatabase5[_.random(0,cadenaDatabase5.length-1)]; }
+    //           if(myDb==7){ sel=cadenaDatabase6[_.random(0,cadenaDatabase6.length-1)]; }
+
+    //           if(myDb==8){ 
+    //             sel=`<img src="${arrayImages[_.random(0,arrayImages.length-1)]}">`; 
+    //             $("#preload-1").append(sel);
+    //           }
+              
+    //           if(sel.length>4){ break; }
+
+    //         }
+
+    //         sel=sel.toLowerCase();
+            
+           
+    //         cadena.splice(i+(j+1), 0, sel);
+            
+            
+    //       }else{
+    //         sel=cadena[i];
+            
+    //         cadena.splice(i+(j+1), 0, sel);
+           
+    //       }//if
+    //     }//for j
+    //     i+=(j);
+
+    //   }//cadena length
+    // }//for i
+    strToCopy=cadena2.join(" ");
+    //console.log(cadena)
+    //cadena.push(" ");
+    //cantidad=cadena.length;
+
+    loopBuffer=n("loop-buffer");
+
+    repeatQ=n("repeat-q");
+    // console.log(repeatQ);
+
+    bRepetir=1;
+    nextRepeat=loopBuffer;
+    repeatCount=0;
+    gotoPrev=0;
+
+    if(myExperiment==8){
+      // clearInterval(kill6);
+
+      // kill6=setInterval(function(){
+
+      //   maxChange=_.random(0,10);
+      //   $("#left-screen").css("padding-left",maxChange+"px");
+      //   $("#right-screen").css("padding-right",maxChange+"px");
+      //   $("#left-screen").css("padding-top",maxChange+"px");
+      //   $("#right-screen").css("padding-top",maxChange+"px");
+
+      //   $("#center-screen").css("padding-left",maxChange+"px");
+      //   $("#center-screen").css("padding-top",maxChange+"px");
+
+      //   /*
+      //   $("#up-screen").html("");
+      //   $("#down-screen").html("");
+      //   $("#center-screen").html("");
+
+      //   $("#left-up-screen").html("");
+      //   $("#right-up-screen").html("");
+      //   $("#left-down-screen").html("");
+      //   $("#right-down-screen").html("");*/
+
+
+
+      // },1);
+      
+
+      // return;
+    }
+
+    /*
+    if(bCW){
+      for(i=0;i<cadena.length;i++){
+        if(cadena[i].length>6){
+          cadena[i]=cadena[i].substr(0, 6);
+          console.log(cadena[i]);
+        }
+      }
+    }*/
+
+    //console.log(arrayRandomWord);
+    bLugar=1;
+
+    iniciar=0;
+
+    console.log(array_sin_img.length);
+    console.log(array_sin_img);
+
+
+    calcularTiempo();
+
+    delay_comienzo=3000; // if(bGif) delay_comienzo=000;
+
+    preloadTxt="";
+
+    for(i=0;i<arrayImagesPreload.length;i++){
+      preloadTxt+=arrayImagesPreload[i];    
+    }
+
+    //swapPreProcess
+
+    if(bSwap){
+      cantidadNext=1; 
+      cantidadPrev=1;
+      inicioNext=0;
+      inicioPrev=0;
+      array_text_swap=[];
+      for(i=0;i<cadena2.length;i++){
+
+        array_img_swap[i]=[];
+        array_text_swap[i]=[];
+
+
+        if(cantidadPrev==1){
+          array_img_swap[i][1]=arrayImagesPreload[i]; 
+          array_text_swap[i][1]=colored(perfect_word[i],array_color[i]);
+          inicionNext=2;
+
+        }else{
+          array_img_swap[i][2]=arrayImagesPreload[i];
+          array_text_swap[i][2]=colored(perfect_word[i],array_color[i]);
+          inicionNext=3;
+        } 
+
+        _prev=""; _prevW=""; contadorPrev=0;
+        for(j=i-1;j>=0;j--){ 
+          if(contadorPrev==0){
+            if(arrayImagesPreload[j].length!=50){ 
+              _prev=arrayImagesPreload[j]; 
+              array_img_swap[i][0]=_prev; 
+              _prevW=colored(perfect_word[j],array_color[i]); 
+              array_text_swap[i][0]=_prevW; 
+              contadorPrev++;  
+            }
+          
+
+          }else{
+            if(arrayImagesPreload[j].length!=50){ 
+              array_img_swap[i][contadorPrev]=arrayImagesPreload[j]; 
+              array_text_swap[i][contadorPrev]=colored(perfect_word[j],array_color[i]);
+              contadorPrev++;   
+
+            }
+            
+
+          }
+
+           if(contadorNext==cantidadPrev) break;  
+
+          
+        }
+
+        _next=""; _nextW=""; contadorNext=0;
+        for(j=i+1;j<cadena2.length;j++){ 
+          if(arrayImagesPreload[j].length!=50){ 
+            if(contadorNext==0){
+               if(arrayImagesPreload[i].length!=50){ 
+                _next= arrayImagesPreload[j]; 
+                array_img_swap[i][inicionNext]=_next; 
+                _nextW="&nbsp;"+colored(perfect_word[j],array_color[i]); 
+                array_text_swap[i][inicioNext]=colored(perfect_word[j],array_color[i]);
+                contadorNext++;  
+              }
+
+            }else{
+               if(arrayImagesPreload[i].length!=50){ 
+                array_img_swap[i][inicionNext+contadorNext]=arrayImagesPreload[j];
+                 array_text_swap[i][inicioNext+contadorNext]=colored(perfect_word[j],array_color[i]); 
+                contadorNext++;  
+              }
+
+            }
+            
+
+            if(contadorNext==cantidadNext) break;   
+
+          }
+        }
+
+        //console.log(array_img_swap[i])
+
+        
+        array_eliminar=[]; contadorEliminar=0;
+        for(j=0;j<array_img_swap.length;j++){
+          try{
+            if(array_img_swap[i][j].length==50){ /*console.log(array_img_swap[i][j]);*/ array_eliminar[contadorEliminar]=j; }
+          }catch(error){}
+          
+        }
+
+
+        if(cantidadPrev==1){
+          for(j=0;j<array_eliminar.length;j++){
+            array_img_swap[i].splice(array_eliminar[j],1);
+          }
+
+
+          if(array_img_swap[i].length>=3){
+            //array_img_swap[i].splice(0,1);
+            array_img_swap[i].splice(array_img_swap[i].length-1,1);
+
+          }
+
+        }
+        
+
+        //console.log(array_img_swap[i].length)
+
+        //if(arrayImagesPreload[i].length==50){ _prev=""; _next=""; }
+
+
+         //if(i>0){ _prev=arrayImagesPreload[i-1]; _prevW=perfect_word[i]; } 
+        // _next=arrayImagesPreload[i+1]; _nextW=
+
+
+         _next = ""; _prev = "";
+         _prevW = ""; _nextW = ""; _
+
+         cadena2[i]=cadena2[i].replace("@prevW",_prevW);
+         cadena2[i]=cadena2[i].replace("@prev",_prev);
+         
+         cadena2[i]=cadena2[i].replace("@nextW",_nextW);
+         cadena2[i]=cadena2[i].replace("@next",_next);
+
+      }
+
+    }else{
+
+       for(i=0;i<cadena2.length;i++){
+          _next = ""; _prev = "";
+         _prevW = ""; _nextW = ""; _
+
+         cadena2[i]=cadena2[i].replace("@prevW",_prevW);
+         cadena2[i]=cadena2[i].replace("@prev",_prev);
+         
+         cadena2[i]=cadena2[i].replace("@nextW",_nextW);
+         cadena2[i]=cadena2[i].replace("@next",_next);
+
+       }
+
+    }
+    
+      
+
+          //_next=arrayImagesPreload[i+1];
+
+    // if(repeatWW==0 && bWiki!=1 /* && bGif==0*/) $("#preload").html(strToCopy);
+   
+    if(repeatWW==0 && bWiki!=1 /* && bGif==0*/){
+      $("#preload").html(preloadTxt);
+
+    }else{
+
+      init(0);
+
+    }
+     
+
+     //setTimeout(function(){ init(0); },delay_comienzo);
+
+     return;
+
+
+  }//en inicio
+
+
+  // clearTimeout(killIntervalRc);
+
+  // if(myExperiment==4 || myExperiment==5){
+  //   bColors=0;
+  //   wordsByFlash=4;
+  // } 
+  // if(myExperiment==6 || myExperiment==7 ){
+  //   bColors=0;
+  //   wordsByFlash=2;
+  // } 
+
+  //mySay=`say ${_palabra1}`;
+  //console.log(mySay);
+
+
+
+  wordsByFlash=n('wordsByFlash');
+
+  //detecto que en vez de poner 2 palabras por flash ponga 2 imágenes
+  if(wordsByFlash==2){
+
+    adicionalPoner=0;
+
+    countImages=0;
+    for(i=0;;i++){
+      if(array_img_count[posicion+i]==0) adicionalPoner++; else countImages++;
+
+      if(countImages==wordsByFlash) break;
+      if(i==5) break;
+
+    }
+    
+    wordsByFlash+=adicionalPoner;
+
+    //console.log(adicionalPoner)
+
+  }
+
+   if(bTts){
+
+
+    mySay="";
+    for(i=0;i<wordsByFlash;i++){
+      mySay+=array_palabras1[posicion+i]+" ";
+    }
+    
+    if(mySay=="y") mySay="i";
+      exec(`say -r ${velocity+100} ${mySay}`, (err, stdout, stderr) => {
+      if (err) {
+        console.error(`exec error: ${err}`);
+        return;
+      } //console.log(`Number of files ${stdout}`);
+    });
+
+  }
+
+ 
+  if(wordsByFlash==1){
+    mostrar = cadena[posicion];
+  }
+  if(wordsByFlash==2){
+    mostrar = `
+      <center>
+      <table>
+        <tr>
+          <td valign="top" style="width: ${(ww)/2}px !important;">${cadena[posicion]}</td><td style="width: 10px !important;">&nbsp;</td><td valign="top" style="width: ${(ww)/2}px !important;">${cadena[posicion+1]}</td>
+        </tr>
+      </table>
+      </center>
+    `;
+  }
+  if(wordsByFlash==3){
+    mostrar = `
+      <table>
+        <tr>
+          <td valign="top" style="width: ${(ww)/3}px !important;">${cadena[posicion]}</td><td  valign="top" style="width: ${(ww)/3}px !important;">${cadena[posicion+1]}</td><td  valign="top" style="width: ${(ww)/3}px !important;">${cadena[posicion+2]}</td>
+        </tr>
+      </table>
+    `;
+  
+  }
+
+  if(wordsByFlash==4){
+    mostrar = `
+      <table>
+        <tr>
+          <td style="width: ${(ww)/wordsByFlash}px !important;">${cadena[posicion]}</td><td>${cadena[posicion+1]}</td><td style="width: ${(ww)/wordsByFlash}px !important;">${cadena[posicion+2]}</td><td style="width: ${(ww)/wordsByFlash}px !important;">${cadena[posicion+3]}</td>
+        </tr>
+      </table>
+    `;
+  
+  }
+  if(wordsByFlash==5){
+    mostrar = `
+      <table>
+        <tr>
+          <td style="width: ${(ww)/wordsByFlash}px !important;">${cadena[posicion]}</td><td>${cadena[posicion+1]}</td><td style="width: ${(ww)/wordsByFlash}px !important;">${cadena[posicion+2]}</td><td>${cadena[posicion+3]}</td><td style="width: ${(ww)/wordsByFlash}px !important;">${cadena[posicion+4]}</td>
+        </tr>
+      </table>
+    `;
+  
+  }
+   if(wordsByFlash==6){
+    mostrar = `
+      <table>
+        <tr>
+          <td style="width: ${(ww)/wordsByFlash}px !important;">${cadena[posicion]}</td><td style="width: ${(ww)/wordsByFlash}px !important;">${cadena[posicion+1]}</td><td>${cadena[posicion+2]}</td><td>${cadena[posicion+3]}</td><td>${cadena[posicion+4]}</td><td style="width: ${(ww)/wordsByFlash}px !important;">${cadena[posicion+5]}</td>
+        </tr>
+      </table>
+    `;
+  
+  }
+
+  if(wordsByFlash==7){
+    mostrar = `
+      <table>
+        <tr>
+          <td style="width: ${(ww)/wordsByFlash}px !important;">${cadena[posicion]}</td><td style="width: ${(ww)/wordsByFlash}px !important;">${cadena[posicion+1]}</td><td style="width: ${(ww)/wordsByFlash}px !important;">${cadena[posicion+2]}</td><td style="width: ${(ww)/wordsByFlash}px !important;">${cadena[posicion+3]}</td><td style="width: ${(ww)/wordsByFlash}px !important;">${cadena[posicion+4]}</td><td style="width: ${(ww)/wordsByFlash}px !important;">${cadena[posicion+5]}</td><td style="width: ${(ww)/wordsByFlash}px !important;">${cadena[posicion+6]}</td>
+        </tr>
+      </table>
+    `;
+  
+  }
+  if(wordsByFlash==8){
+    mostrar = `
+      <table>
+        <tr>
+          <td style="width: ${(ww)/wordsByFlash}px !important;">${cadena[posicion]}</td><td style="width: ${(ww)/wordsByFlash}px !important;">${cadena[posicion+1]}</td><td style="width: ${(ww)/wordsByFlash}px !important;">${cadena[posicion+2]}</td><td style="width: ${(ww)/wordsByFlash}px !important;">${cadena[posicion+3]}</td><td style="width: ${(ww)/wordsByFlash}px !important;">${cadena[posicion+4]}</td><td style="width: ${(ww)/wordsByFlash}px !important;">${cadena[posicion+5]}</td><td style="width: ${(ww)/wordsByFlash}px !important;">${cadena[posicion+6]}</td><td style="width: ${(ww)/wordsByFlash}px !important;">${cadena[posicion+7]}</td>
+        </tr>
+      </table>
+    `;
+  
+  }
+  if(wordsByFlash==9){
+    mostrar = `
+      <table>
+        <tr>
+          <td>${cadena[posicion]}</td><td>${cadena[posicion+1]}</td><td>${cadena[posicion+2]}</td><td>${cadena[posicion+3]}</td><td>${cadena[posicion+4]}</td><td>${cadena[posicion+5]}</td><td>${cadena[posicion+6]}</td><td>${cadena[posicion+7]}</td><td>${cadena[posicion+8]}</td>
+        </tr>
+      </table>
+    `;
+  
+  }
+  if(wordsByFlash==10){
+    mostrar = `
+      <table>
+        <tr>
+          <td>${cadena[posicion]}</td><td>${cadena[posicion+1]}</td><td>${cadena[posicion+2]}</td><td>${cadena[posicion+3]}</td><td>${cadena[posicion+4]}</td><td>${cadena[posicion+5]}</td><td>${cadena[posicion+6]}</td><td>${cadena[posicion+7]}</td><td>${cadena[posicion+8]}</td><td>${cadena[posicion+9]}</td>
+        </tr>
+      </table>
+    `;
+  
+  }
+   if(wordsByFlash==11){
+    mostrar = `
+      <table>
+        <tr>
+          <td>${cadena[posicion]}</td><td>${cadena[posicion+1]}</td><td>${cadena[posicion+2]}</td><td>${cadena[posicion+3]}</td><td>${cadena[posicion+4]}</td><td>${cadena[posicion+5]}</td><td>${cadena[posicion+6]}</td><td>${cadena[posicion+7]}</td><td>${cadena[posicion+8]}</td><td>${cadena[posicion+9]}</td><td>${cadena[posicion+10]}</td>
+        </tr>
+      </table>
+    `;
+  
+  }
+  if(wordsByFlash==12){
+    mostrar = `
+      <table>
+        <tr>
+          <td>${cadena[posicion]}</td><td>${cadena[posicion+1]}</td><td>${cadena[posicion+2]}</td><td>${cadena[posicion+3]}</td><td>${cadena[posicion+4]}</td><td>${cadena[posicion+5]}</td><td>${cadena[posicion+6]}</td><td>${cadena[posicion+7]}</td><td>${cadena[posicion+8]}</td><td>${cadena[posicion+9]}</td><td>${cadena[posicion+10]}</td><td>${cadena[posicion+11]}</td>
+        </tr>
+      </table>
+    `;
+  
+  }
+  if(wordsByFlash==13){
+    mostrar = `
+      <table>
+        <tr>
+          <td>${cadena[posicion]}</td><td>${cadena[posicion+1]}</td><td>${cadena[posicion+2]}</td><td>${cadena[posicion+3]}</td><td>${cadena[posicion+4]}</td><td>${cadena[posicion+5]}</td><td>${cadena[posicion+6]}</td><td>${cadena[posicion+7]}</td><td>${cadena[posicion+8]}</td><td>${cadena[posicion+9]}</td><td>${cadena[posicion+10]}</td><td>${cadena[posicion+11]}</td><td>${cadena[posicion+12]}</td>
+        </tr>
+      </table>
+    `;
+  
+  }
+  if(wordsByFlash==14){
+    mostrar = `
+      <table>
+        <tr>
+          <td>${cadena[posicion]}</td><td>${cadena[posicion+1]}</td><td>${cadena[posicion+2]}</td><td>${cadena[posicion+3]}</td><td>${cadena[posicion+4]}</td><td>${cadena[posicion+5]}</td><td>${cadena[posicion+6]}</td><td>${cadena[posicion+7]}</td><td>${cadena[posicion+8]}</td><td>${cadena[posicion+9]}</td><td>${cadena[posicion+10]}</td><td>${cadena[posicion+11]}</td><td>${cadena[posicion+12]}</td><td>${cadena[posicion+13]}</td>
+        </tr>
+      </table>
+    `;
+  
+  }
+
+
+  //polemico
+  mostrar = mostrar.split(`${(ww)/wordsByFlash}px`).join("auto");
+  mostrar = "<center>" + mostrar + "</center>";
+
+
+  // if(wordsByFlash==2){
+  //   mostrar = cadena[posicion] + " " + cadena[posicion+1] ;
+
+  // }
+
+  // if(wordsByFlash==3){
+  //   mostrar = cadena[posicion] + " " + cadena[posicion+1] + " " + cadena[posicion+2] ;
+
+  // }
+
+  // if(wordsByFlash==4){
+  //   mostrar = cadena[posicion] + " " + cadena[posicion+1] + " " + cadena[posicion+2] + " " + cadena[posicion+3] ;
+
+  // }
+  
+  // if(wordsByFlash==5){
+  //   mostrar = cadena[posicion] + " " + cadena[posicion+1] + " " + cadena[posicion+2] + " " + cadena[posicion+3] + " " + cadena[posicion+4];
+
+  // }
+
+  // if(wordsByFlash==6){
+  //   mostrar = cadena[posicion] + " " + cadena[posicion+1] + " " + cadena[posicion+2] + " " + cadena[posicion+3] + " " + cadena[posicion+4] + " " + cadena[posicion+5];
+
+  // }
+
+  // if(wordsByFlash==7){
+  //   mostrar = cadena[posicion] + " " + cadena[posicion+1] + " " + cadena[posicion+2] + " " + cadena[posicion+3] + " " + cadena[posicion+4] + " " + cadena[posicion+5] + " " + cadena[posicion+6];
+
+  // }
+  //console.log(cadena);
+
+  bLugar=!bLugar;
+
+  $("#left-screen").html("");
+  $("#right-screen").html("");
+  // $("#up-screen").html("");
+  // $("#down-screen").html("");
+  $("#center-screen").html("");
+
+  //$("#left-up-screen").html("");
+  // $("#right-up-screen").html("");
+  // $("#left-down-screen").html("");
+  // $("#right-down-screen").html("");
+
+  if(readingMode==1){
+  
+    if(bLugar){
+
+      lugar="right-screen";
+      $("#left-screen").html("");
+      sound1.stop();
+      id=sound1.play();
+      sound1.stereo(1, id);
+
+    }else{
+      lugar="left-screen";
+      $("#right-screen").html("");
+      sound1.stop();
+       id=sound1.play();
+      sound1.stereo(-1, id);
+
+    }
+
+  }
+
+  if(readingMode==2){
+
+    
+
+    if(bLugar){
+
+      lugar="down-screen";
+      $("#up-screen").html("");
+
+    }else{
+      lugar="up-screen";
+      $("#down-screen").html("");
+
+    }
+
+  }
+
+  if(readingMode==3){
+
+    if(circleFase==0){
+      lugar="left-screen";
+    }
+
+    if(circleFase==1){
+      lugar="up-screen";
+      
+    } 
+
+    if(circleFase==2){
+
+      lugar="right-screen";
+    }
+
+    if(circleFase==3){
+      lugar="down-screen";
+    
+    }
+    
+
+    circleFase++;
+    if(circleFase==4)
+      circleFase=0;
+
+  }
+
+  if(readingMode==4){
+
+
+    if(circleFase==2){
+      lugar="left-screen";
+    }
+
+    if(circleFase==1){
+      lugar="up-screen";
+      
+    } 
+
+    if(circleFase==0){
+
+      lugar="right-screen";
+    }
+
+    if(circleFase==3){
+      lugar="down-screen";
+    
+    }
+    
+
+    circleFase++;
+    if(circleFase==4)
+      circleFase=0;
+
+  }
+
+  if(readingMode==5){
+
+    _circleFase=circleFase;
+
+    for(;;){
+
+      circleFase=_.random(0,3);
+
+      if(circleFase!=_circleFase)
+        break;
+    }
+
+    if(circleFase==2){
+      lugar="left-screen";
+    }
+
+    if(circleFase==1){
+      lugar="up-screen";
+      
+    } 
+
+    if(circleFase==0){
+
+      lugar="right-screen";
+    }
+
+    if(circleFase==3){
+      lugar="down-screen";
+    
+    }
+  
+
+  }
+
+  if(readingMode==6){
+    $("#left-screen").html("");
+    $("#right-screen").html("");
+    $("#up-screen").html("");
+    $("#down-screen").html("");
+    $("#center-screen").html("");
+
+    lugar="center-screen";
+
+  }
+
+  if(readingMode==7){
+
+
+    if(circleFase==2){
+      lugar="left-down-screen";
+    }
+
+    if(circleFase==1){
+      lugar="right-up-screen";
+      
+    } 
+
+    if(circleFase==0){
+
+      lugar="left-up-screen";
+    }
+
+    if(circleFase==3){
+      lugar="right-down-screen";
+    
+    }
+    
+
+    circleFase++;
+    if(circleFase==4)
+      circleFase=0;
+
+  }
+
+  if(readingMode==8){
+
+
+    if(circleFase==2){
+      lugar="right-up-screen";
+    }
+
+    if(circleFase==1){
+      lugar="right-down-screen";
+      
+    } 
+
+    if(circleFase==0){
+
+      lugar="left-up-screen";
+    }
+
+    if(circleFase==3){
+      lugar="left-down-screen";
+    
+    }
+    
+
+    circleFase++;
+    if(circleFase==4)
+      circleFase=0;
+
+  }
+
+  if(readingMode==9){
+
+    _circleFase=circleFase;
+
+    for(;;){
+
+      circleFase=_.random(0,3);
+
+      if(circleFase!=_circleFase)
+        break;
+    }
+
+
+    if(circleFase==2){
+      lugar="right-up-screen";
+    }
+
+    if(circleFase==1){
+      lugar="right-down-screen";
+      
+    } 
+
+    if(circleFase==0){
+
+      lugar="left-up-screen";
+    }
+
+    if(circleFase==3){
+      lugar="left-down-screen";
+    
+    }
+    
+    /*
+    circleFase++;
+    if(circleFase==4)
+      circleFase=0;*/
+
+  }
+
+  //console.log(readingMode);
+
+  fontSize=30;
+
+  if(wordsByFlash>4)
+    fontSize=30;
+
+  transform="";
+
+  if(myTransformation==2){
+    
+    transform="transform:rotateX(180deg);";
+    
+  }
+  if(myTransformation==3){
+    transform="transform:rotateY(180deg);";
+          
+  }
+  /*
+  if(myTransformation==4){
+    transform="transform:rotateX(180deg) ";
+    transform+="transform:rotateY(180deg);";
+  
+
+
+  }*/
+  if(myTransformation==4){
+
+    if(bLugar){
+
+      //lugar="right-screen";
+      //$("#left-screen").html("");
+      transform="transform:skewY(30deg);"
+
+    }else{
+      //lugar="left-screen";
+      //$("#right-screen").html("");
+      transform="transform:skewY(-30deg);"
+
+    }          
+  }
+
+  if(myTransformation==5){
+    
+    transform="transform:skewY("+_.random(-40,40)+"deg);"
+          
+  }
+
+  //genero la impresion
+  txtLength=0;
+
+  emo="";
+
+  if(myExperiment==9){
+    letras_emo="abcdefghilmnopqrstuvy".split("");
+    rnd=_.random(0,letras_emo.length-1);
+    cara=letras_emo[rnd];
+
+    if(cara=="a" || cara=="e"  || cara=="n" || cara=="o"  || cara=="r"  || cara=="s")
+      cara+=_.random(1,4);
+
+    poner_1=`<img src="emociones/${cara}.gif" width="74" height="100">`;
+    emo=`<center>${poner_1}</center><br>`;
+
+
+  }
+
+  if(myExperiment==10){
+    a_1=["female","male"];
+    rnd=_.random(1,155);
+    rnd1=_.random(0,1);
+    sexo=a_1[rnd1];
+
+    poner_1=`<img src="faces/${sexo}/${rnd}.png" width="74" height="100">`;
+    emo=`<center>${poner_1}</center><br>`;
+
+
+  }
+  
+  if(bColors){
+
+    if(bRc){
+
+      
+
+      killIntervalRc=setInterval(function(){
+
+        poneme="";
+        for(i=0;i<mostrar.length;i++){
+
+          
+
+          if(mostrar[i]==" "){
+            poneme += `<span style="color: black;">&nbsp;</span>`;
+
+          }else{
+            poneme += `${emo}<span style="color: ${random_color('rgb')}; text-shadow: 1px 1px ${random_color('rgb')}; font-size: ${fontSize}px;">${mostrar[i]}</span>`;
+
+          }
+
+          
+        }
+
+        $("#"+lugar).html(`<div style="${transform}">`+poneme+"</div>");
+
+
+      },10);
+
+    }else{
+      poneme="";
+      for(i=0;i<mostrar.length;i++){
+
+        if(mostrar[i]==" "){
+          poneme += `<span style="color: black;">&nbsp;</span>`;
+
+        }else{
+          poneme += `<span style="color: ${abc1[mostrar[i]]}; text-shadow: 1px 1px gray;  font-size: ${fontSize}px;">${mostrar[i]}</span>`;
+
+        }
+
+        
+      }
+
+      //$("img").css("transform", "scaleX("+x+")")
+
+
+      //muestra el texto y la imágen
+      transform="";
+      if(_.random(0,1)){
+       // transform=`transform: scaleY(-1);`;
+
+      }
+      
+      $("#"+lugar).html(`${emo}<div style="${transform}">`+poneme+"</div>");
+
+
+    }
+
+  }else{
+    if(myExperiment==4 || myExperiment==5 || myExperiment==6 || myExperiment==7){
+
+
+     
+
+      
+
+
+    }else{//myExperiment
+
+      if(myExperiment==3){
+        _p="";
+        for(kk=0;kk<mostrar.length;kk++){
+
+          if(kk==0 || mostrar[kk+1]==" " || kk==mostrar.length-1){
+            _p+=`<span class="t-m">${mostrar[kk]}</span>`;
+          }
+          else
+          {
+            _p+=`<span class="t-e">${mostrar[kk]}</span>`;
+          }
+
+        }
+        mostrar = _p;
+      }
+
+
+       //
+       // !important aca se imprime el texto 
+       // 
+      $("#"+lugar).html(`<div style="${transform}"><span style="font-size: ${fontSize}px;">`+mostrar+`</span></div>`);
+
+      if(myExperiment==3){
+        $(".t-e").css("color","black");
+        setTimeout(function(){ $(".t-e").css("color",currentColor); }, 50 );
+
+      }
+  
+    }//else myExperiment
+    //txtLength=mostrar.length;
+    
+
+    /*
+
+    var Hello = React.createClass({
+      displayName: 'Hello',
+      render: function() {
+        return React.createElement("div", null, "", this.props.name);
+      }
+    });
+
+    ReactDOM.render(
+      React.createElement(Hello, {name: mostrar}),
+      document.getElementById(lugar)
+    );
+    */
+
+  }
+  
+
+  posicion+=wordsByFlash;
+
+  if(posicion>=nextRepeat){
+
+    // console.log("hola: "+ "posicion:"+ posicion + " repeatQ "  + repeatQ);
+
+
+
+    repeatCount++;
+
+    if(repeatQ!=1){
+
+      if(repeatCount==repeatQ){
+
+        repeatCount=0;
+        gotoPrev=posicion;
+        nextRepeat+=loopBuffer;
+      }else{
+        posicion=gotoPrev;
+
+      }
+    }//repeatQ!=
+  }//posicion%
+
+  bLoop=0;
+
+
+  if(posicion>=cantidad){
+    if(bLoop){ 
+      stopFlash();
+      $("#play-btn").click();
+      return;
+      
+      
+    }else{
+
+       setTimeout(function(){ 
+
+           stopFlash();
+            if(currentPageGlobal<countPages){
+              currentPageGlobal++;
+              loadPage(currentPageGlobal);
+              play();
+
+            }
+   
+
+       },__time);
+     
+      return;
+
+    } 
+    
+
+  } 
+
+  try{
+     if(!(exclude[myFileName]===null)){
+      for(i=0;i<exclude[myFileName].length;i++){
+
+        _cw=exclude[myFileName][i].toLowerCase();
+
+        if(perfect_word[posicion-1].toLowerCase()==_cw){
+          $(".myTxt").html("&nbsp;");
+          //console.log("exclude")
+        }//if
+      }//for
+    }//if
+
+  }catch(err){
+
+
+
+  }
+  
+ 
+
+  if(bCuentas){
+
+    for(i=0;i<emotions.length;i++){
+
+      if(emotions[i]==perfect_word[posicion-1]){
+         $(".myTxt").html("&nbsp;");
+      }
+    }
+
+  }
+
+  calcularTiempo();
+
+  velocity=n("velocityFlash");
+
+  /*
+  if(myExperiment==2){
+    if(txtLength>30){
+      velocity=250;
+      console.log("retardo")
+    }
+  }*/
+
+ t_flash=( 60000/ velocity ) * wordsByFlash;
+
+ 
+
+ //if(mostrar.search("flashaste")!=-1) multiplicador=0.5;
+
+ www=$(window).width();
+ hhh=$(window).height();
+
+  // $("#texto").css("top",parseInt(hhh/2))
+  // $("#texto").css("left",parseInt(www/2))
+
+  //$("#texto").html(www+" "+hhh)
+
+
+ //hide
+ if(arrayLength[posicion-1]<=10) $(".myTxt").css("visibility","hidden");
+ setTimeout(function(){  $(".myTxt").css("visibility","visible"); }, t_flash/2 /**0.66*/ /* t_flash-50 */ /*t_flash/2 */ );
+
+ 
+ 
+
+ //if(wordsByFlash<3){
+  // if(/*images_per_word[posicion-1]>0 &&*/ n_mostrar<0) $(".myTxt").css("visibility","hidden");
+
+  // if ( !(_.random(1,100)<=n("hideWord")) ){
+  //   //setTimeout(function(){ $(".myTxt").css("visibility","visible"); }, (( 60000/ velocity ) * wordsByFlash * multiplicador + plustime)/2 );
+  //     $(".myTxt").css("visibility","visible");
+  // } 
+ //}
+ n_mostrar--;
+
+ 
+  //setTimeout(function(){ $(".myTxt").css("visibility","hidden"); }, (( 60000/ velocity ) * wordsByFlash * multiplicador + plustime)/2+50 /*50*/ /**0.66*/ /* t_flash-50 */ /*t_flash/2 */ );
+
+  plustime=0;
+  multiplicador=1;
+  multiplicadorEidetic=1;
+
+ framesDealay=window.frames;
+ myFrames=window.frameDelay;
+ //$(".currentGif").prop("speed","0.5")
+
+ if(wordsByFlash==1 && arrayLength[posicion-1]>=10  && readingMode!=1  && velocity>=250 /* && cadena[posicion-1].search("_")==-1 */){
+  multiplicador=2;
+  multiplicadorEidetic=3;
+
+  if(arrayLength[posicion-1]>=15){ multiplicadorEidetic=2.2; multiplicador=3.5; } 
+  if(arrayLength[posicion-1]>=20){ multiplicadorEidetic=2.5; multiplicador=4; } 
+
+  //console.log("multi " + multiplicador)
+ }
+
+ if(velocity<=200) multiplicador=1;
+
+
+ //palabras cortas pasan mas rapido
+ if(wordsByFlash==1 && bTts==0){
+
+  // if( arrayLength[posicion-1]<=5 && repeatWW==0){ multiplicador=1; }
+  // if( arrayLength[posicion-1]<=4 && repeatWW==0){ multiplicador=0.9; }
+   if( arrayLength[posicion-1]<=3 && repeatWW==0){ multiplicador=0.9; }
+   if( arrayLength[posicion-1]<=2 && repeatWW==0){ multiplicador=0.5; }
+   if( arrayLength[posicion-1]==1 && repeatWW==0){ multiplicador=0.4; }
+
+ }else{
+  
+
+  //calcula tiempo plus de palabras  cortas
+  
+  /*
+  multiplicador=0;
+  for(i=0;i<wordsByFlash;i++){
+
+    if(arrayLength[posicion-1+i]>=20) multiplicador=-2.85;
+    if(arrayLength[posicion-1+i]>=15) multiplicador=-2.6;
+  
+    if( arrayLength[posicion-1+i]==5 && repeatWW==0){ multiplicador=0.1; }
+    if( arrayLength[posicion-1+i]==4 && repeatWW==0){ multiplicador=0.2; }
+    if( arrayLength[posicion-1+i]==3 && repeatWW==0){ multiplicador=0.5; }
+    if( arrayLength[posicion-1+i]==2 && repeatWW==0){ multiplicador=0.6; }
+    if( arrayLength[posicion-1+i]==1 && repeatWW==0){ multiplicador=0.8; }
+
+    plustime-= ( 60000/ velocity ) * wordsByFlash * multiplicador;
+  }
+
+  //multiplicador=multiplicador/wordsByFlash;*/
+ }
+
+ if(readingMode==1){
+  if(wordsByFlash==1 && bTts==0){
+   //if( arrayLength[posicion-1]<=5 && repeatWW==0){ multiplicador=1; }
+   //if( arrayLength[posicion-1]<=4 && repeatWW==0){ multiplicador=0.9; }
+   if( arrayLength[posicion-1]<=3 && repeatWW==0){ multiplicador=0.4; }
+   if( arrayLength[posicion-1]<=2 && repeatWW==0){ multiplicador=0.2; }
+  }
+ }
+
+ // console.log(array_palabras[posicion-1])
+
+ //hacer retardo para multiple words por imagenes adicionales
+ if(images_per_word[posicion-1]>1 && arrayLength[posicion-1]<10 && readingMode!=1 ) multiplicador+=(images_per_word[posicion-1]*0.25);
+
+
+ //ocultar palabras cuando es lento
+ 
+ //if(velocity<=325){
+   // if( arrayLength[posicion-1]>2 ) $(".myTxt").css("visibility","hidden");
+   // setTimeout(function(){ $(".myTxt").css("visibility","visible");  }, (( 60000/ velocity ) * wordsByFlash * multiplicador + plustime)-50 /*50*/ /**0.66*/ /* t_flash-50 */ /*t_flash/2 */ );
+ //}
+
+ //setTimeout(function(){ $(".myTxt").css("visibility","hidden"); }, 50 );
+
+ 
+ //console.log("sale "+ ((( 60000/ velocity ) * wordsByFlash * multiplicador + plustime)-100) )
+ //console.log(multiplicador)
+
+ 
+
+ ////////////////////////////////////////////////////////
+ //agrupation of images : only show text every x images
+
+
+ agrupation=n("agrupationImages");
+ if(cadena[posicion-1].search("x-gif")!=-1){ console.log("x-gif"); plustime+=50;   }
+
+ __time=1000;
+
+ if(agrupation!=0){
+
+  $(".myTxt").css("visibility","hidden");
+
+  if(array_img_count[posicion-1]>=1) contadorImgMostrar++;
+   // contadorImgMostrar += array_img_count[posicion-1]
+
+   textoMostrar+=(" "+array_palabras[posicion-1].replace("nn","ñ"));
+
+   contadorPalabras++;
+
+   if(contadorImgMostrar%agrupation==0 && contadorImgMostrar!=0 ){ //every x images show text
+
+    $(".myTxt").html(textoMostrar);
+
+    console.log(textoMostrar)
+
+    velocity2=n("velocity2")
+    plustime2=700; //post process asoc
+    __time=( 60000/ velocity2 ) * wordsByFlash * multiplicador + plustime + tiempoDescanso;
+    
+    
+    //show text and hide image
+    setTimeout(function(){ 
+
+      $(".anim").css("visibility","hidden");
+      setTimeout(function(){ $(".myTxt").css("visibility","visible"); },plustime2-100);
+   
+
+    },__time);
+    
+
+    restaPalabra=0; //test
+    plustime+=( ( ( 60000/ velocity2 ) * wordsByFlash) * (contadorPalabras - restaPalabra) ); //delay all words
+    plustime+=plustime2; //blank time
+
+   ///* if(velocity>=450) */ plustime=( ( ( 60000/ 300 ) * wordsByFlash) * ( contadorPalabras -  restaPalabra )  );// think in word is less quick than think in images for rapid reading speed >= 450 wpm
+
+    textoMostrar="";
+    contadorPalabras=0;
+    contadorImgMostrar=0;
+
+  }//contadorImg mostrar if
+ }//agrupation if
+
+ 
+ ///////////////// 
+ //set time delay
+
+
+ _time=( 60000/ velocity ) * wordsByFlash * multiplicador + plustime + tiempoDescanso;
+
+
+ //delay 0 words without images
+ if(agrupation!=0 && array_img_count[posicion-1]==0) _time=0;
+ if(agrupation!=0){
+
+  
+ }
+
+
+ /////////////////////////
+ //gif speed configuration
+
+ newSpeed=1;
+
+ try {
+   
+
+   _totalTime=window.frameDelay*window.frames;
+   //newFrame=( (_time-25)*window.frameDelay ) /_totalTime;
+
+   _time1 = _time-100;
+   newFrameDelay = (_time1)/window.frames;
+   newSpeed = window.frameDelay  / newFrameDelay  ;
+
+
+   newSpeed=((_time-25)/newFrame)*2;
+
+   //console.log(window.frames);
+   //console.log(window.frameDelay);
+   //console.log($(".currentGif").prop("speed"));
+   
+   //$(".currentGif").prop("speed",newSpeed);
+
+  }
+  catch(err) {
+   
+  }
+
+   //console.log(newSpeed)
+   $(".currentGif").css("zoom","2")
+
+  
+  /*
+  if(bGif){
+
+    dur=$("#gif"+(posicion-1)).attr("duration");
+    new_speed=_time/dur;
+    console.log( $("#gif"+(posicion-1)).attr("speed"))
+    $("#gif"+(posicion-1)).attr("speed",new_speed)
+    console.log(new_speed)
+  }
+  */
+
+  /*
+    //obtener atributos elemento
+    $(this).each(function() {
+      $.each(this.attributes, function() {
+        // this.attributes is not a plain object, but an array
+        // of attribute nodes, which contain both the name and value
+        if(this.specified) {
+          console.log(this.name, this.value);
+        }
+      });
+    });
+
+  */
+
+  //console.log(posicion-1);
+  //console.log(mostrar)
+
+
+ if(bDescanso){
+  $("#center-screen").css("color","red");
+
+  bDescanso=0;
+  tiempoDescanso=0;
+   
+  //console.log("change descanso")
+ }else{
+
+  $("#center-screen").css("color","green");
+
+
+ }
+ //console.log(images_per_word[posicion-1])
+
+ //$("img").css("transform", "scaleY(1)");
+ //setTimeout(function(){ $("img").css("transform", "scaleY(-1)");}, (( 60000/ velocity ) * wordsByFlash * multiplicador + plustime)/2 /**0.66*/ /* t_flash-50 */ /*t_flash/2 */ );
+ //setTimeout(function(){ /*$(".myTxt").hide();*/ }, t_flash-30 /*t_flash/2 */ );
+ //if(wordsByFlash==1) setTimeout(function(){ /*$(".ci").css("visibility","visible");*/ /* $(".ci").css("visibility","hidden"); *//* $(".myTxt").hide(); */ $(".myTxt").css("visibility","hidden"); }, /*t_flash/2*/ 50 );
+
+
+//hide system
+//if(wordsByFlash==1 && readingMode==6 && repeatWW==0 ){ setTimeout(function(){ /*$(".ci").css("visibility","visible");*/ /* $(".ci").css("visibility","hidden");*/ /* $(".myTxt").hide();*/   $(".myTxt").css("visibility","hidden"); }, /*t_flash/2*/ 5*multiplicadorEidetic ); }
+
+ if(bTts==1 /*&& n("hideWord")==100*/){ $(".myTxt").css("visibility","hidden"); }
+
+ //$(".myTxt").css("visibility","hidden");
+
+ // if(posicion%12==0) plustime=500;
+
+  //console.log(_time);
+
+   if(animation_system==7){
+
+    $(".ci").css("transform", "scaleY(-1)");
+
+  
+   setTimeout(function(){  $(".ci").css("transform", "scaleY(1)"); },_time/3);
+
+
+  }
+
+ if(wordsByFlash==1 && bPiano==1) playWord(array_palabras[posicion-1]);
+
+ $(".anim").css("animation-duration",((_time-0)/1000)+"s")
+ $(".myTxt").css("animation-duration",((_time-0)/1000)+"s")
+
+ if(introMode==1){
+
+   killInterval=setTimeout(function(){ init() },  _time );
+
+ }
+  
+  $("#stats2").html("["+parseInt(t_flash)+"]");
+
+
+  calcularTiempo();
+
+  if(posicion==proximoCargar){
+    preloadImages(proximoCargar,cantidadCargar);
+    proximoCargar+=aumentoCargar;
+
+  }
+   
+}
+
+contadorImgMostrar=0;
+textoMostrar="";
+contadorPalabras=0;
+
+var _time;
+
+
+var t_flash=0;
+__time=1000;
+  
+
+function stopFlash(){
+  
+
+  if(bPlay){
+    bPlay=0;
+    $("#play-btn").val("start");
+    
+    
+  }
+  $("#left-screen").html("");
+  $("#right-screen").html("");
+  // $("#up-screen").html(":)");
+  // $("#down-screen").html(":)");
+
+  $("#center-screen").html(`<center><img src="img/wis_image.png"> <br>\\WIS\\<br>Word Image System<center>`);
+
+  // $("#left-up-screen").html("");
+  // $("#right-up-screen").html("");
+  // $("#left-down-screen").html("");
+  // $("#right-down-screen").html("");
+
+  iniciar=1;
+  clearTimeout(killInterval);
+  // clearTimeout(killIntervalRc);
+
+  $("#preload-1").html("");
+  $("#preload").html("");
+  $("#stats").html("");
+
+}
+
+
+var getDuration = function(millis){
+  var dur = {};
+  var units = [
+      {label:"millis",    mod:1000},
+      {label:"seconds",   mod:60},
+      {label:"minutes",   mod:60},
+      {label:"hours",     mod:24},
+      {label:"days",      mod:31}
+  ];
+  // calculate the individual unit values...
+  units.forEach(function(u){
+      millis = (millis - (dur[u.label] = (millis % u.mod))) / u.mod;
+  });
+  // convert object to a string representation...
+  var nonZero = function(u){ return dur[u.label]; };
+  dur.toString = function(){
+      return units
+          .reverse()
+          .filter(nonZero)
+          .map(function(u){
+              return dur[u.label] + " " + (dur[u.label]==1?u.label.slice(0,-1):u.label);
+          })
+          .join(', ');
+  };
+
+  /*
+  console.log(dur);
+  x = dur.split(",");
+  poner = "";
+  for(i=0;i<x.length;i++){
+    if(x[i].indexOf("millis")!=1){
+      continue;
+    }
+    poner += x[i];
+
+  }*/
+
+  //return dur;
+  return dur.hours+":"+dur.minutes+":"+dur.seconds;//+":"+dur.millis;
+};
+
+
+
+var abc1  =  {
+
+  'a' : 'rgb(0,0,180)','A' : 'rgb(0,0,180)','á' : 'rgb(0,0,180)','Á' : 'rgb(0,0,180)','b' : 'rgb(175,13,102)','B' : 'rgb(175,13,102)','c' : 'rgb(146,248,70)','C' : 'rgb(146,248,70)','d' : 'rgb(255,200,47)','D' : 'rgb(255,200,47)','e' : 'rgb(255,118,0)','E' : 'rgb(255,118,0)','é' : 'rgb(255,118,0)','É' : 'rgb(255,118,0)','f' : 'rgb(255,152,213)','F' : 'rgb(255,152,213)','g' : 'rgb(235,235,222)','G' : 'rgb(235,235,222)','h' : 'rgb(100,100,100)','H' : 'rgb(100,100,100)','i' : 'rgb(255,255,0)','I' : 'rgb(255,255,0)','í' : 'rgb(255,255,0)','Í' : 'rgb(255,255,0)','j' : 'rgb(255,255,150)','J' : 'rgb(255,255,150)','k' : 'rgb(55,19,112) ','K' : 'rgb(55,19,112) ','l' : 'rgb(202,62,94)','L' : 'rgb(202,62,94)','m' : 'rgb(205,145,63)','M' : 'rgb(205,145,63)','n' : 'rgb(12,75,100)','N' : 'rgb(12,75,100)','ñ' : 'rgb(12,75,100)','ñ' : 'rgb(12,75,100)','o' : 'rgb(255,0,0)','O' : 'rgb(255,0,0)','ó' : 'rgb(255,0,0)','Ó' : 'rgb(255,0,0)','p' : 'rgb(175,155,50)','P' : 'rgb(175,155,50)','q' : 'rgb(185,185,185)','Q' : 'rgb(185,185,185)','r' : 'rgb(37,70,25)','R' : 'rgb(37,70,25)','s' : 'rgb(121,33,135)','S' : 'rgb(121,33,135)','t' : 'rgb(83,140,208)','T' : 'rgb(83,140,208)','u' : 'rgb(0,154,37)','U' : 'rgb(0,154,37)','ú' : 'rgb(0,154,37)','Ú' : 'rgb(0,154,37)','v' : 'rgb(178,220,205)','V' : 'rgb(178,220,205)','w' : 'rgb(169,34,0)','W' : 'rgb(169,34,0)','x' : 'rgb(0,0,74)','X' : 'rgb(0,0,74)','y' : 'rgb(175,200,74)','Y' : 'rgb(175,200,74)','z' : 'rgb(63,25,12)','Z' : 'rgb(63,25,12)','0' : 'rgb(0,0,180)','0' : 'rgb(0,0,180)','1' : 'rgb(175,13,102)','1' : 'rgb(175,13,102)','2' : 'rgb(146,248,70)','2' : 'rgb(146,248,70)','3' : 'rgb(255,200,47)','3' : 'rgb(255,200,47)','4' : 'rgb(255,118,0)','4' : 'rgb(255,118,0)','5' : 'rgb(255,152,213)','5' : 'rgb(255,152,213)','6' : 'rgb(235,235,222)','6' : 'rgb(235,235,222)','7' : 'rgb(100,100,100)','7' : 'rgb(100,100,100)','8' : 'rgb(255,255,0)','8' : 'rgb(255,255,0)','9' : 'rgb(255,255,150)','9' : 'rgb(255,255,150)'   
+    
+};
+
+//
+// x: letter yy: letter border zz: word border
+//
+function colored(x,yy,zz){
+
+  var y="";
+  for(var i=0;i<x.length;i++){
+
+    zz="gray";
+    yy="gray";
+
+    y+=`<span class="letter-1 letter-1-${ quitaAcentos(x[i]) }" style="color: ${abc1[x[i]]};  -webkit-text-stroke-width: 2px; -webkit-text-stroke-color: ${yy};  /* text-shadow: 7px 7px ${zz};*/">${x[i]}</span>`;
+
+    //console.log(i);
+  }
+  return y;
+
+  // for(i=0;i<2;i++){
+
+  //   alert(abc1[i]);
+  // }
+
+  // return `<span style="color: yellow; -webkit-text-stroke-width: 2px; -webkit-text-stroke-color: red;">${x}</span>`;
+  
+  // return `<span style="color: white;">${x}</span>`;
+
+  // return `<span style="color: ${abc1[x[0]]}">${x}</span>`;
+
+  //if(wordsByFlash>1) return x;
+
+  //console.log(colorDescanso)
+  //return `<span style="${colorDescanso}">${x}</span>`
+  return x;
+
+  var y="";
+  for(var i=0;i<x.length;i++){
+
+    y+=`<span class="letter-1 letter-1-${ quitaAcentos(x[i]) }" style="color: ${abc1[x[i]]}; /* -webkit-text-stroke-width: 3px; -webkit-text-stroke-color: ${yy}; text-shadow: 7px 7px ${zz};*/">${x[i]}</span>`;
+
+    //console.log(i);
+  }
+  return y;
+
+  var y="";
+  for(var i=0;i<x.length;i++){
+
+    y+=`<span class="letter-1 letter-1-${ quitaAcentos(x[i]) }" style="color: ${abc1[x[i]]}; -webkit-text-stroke-width: 3px; -webkit-text-stroke-color: ${yy}; text-shadow: 7px 7px ${zz};">${x[i]}</span>`;
+
+    //console.log(i);
+  }
+  return y;
+
+  // dict=_.extend(abc1);
+
+  // for(var key in Object.keys(dict)){
+  //   var value = dict[key];
+  // /* use key/value for intended purpose */
+  //   x=x.split("\n").join(" ");
+  // }
+
+
+}
+
+velocityChangeColor=25;
+
+//change color 
+
+function changeColor(){
+
+
+  //$(".letter-1").css("-webkit-text-stroke-color",getRandomColor());
+
+  for(i=0;i<medida1.length;i++){ $(".letter-1-"+medida1.charAt(i)).css("color",getRandomColor()); }
+  
+
+  /*
+
+  for(i=0;i<medida1.length;i++){
+
+    $(".letter-1-"+medida1.charAt(i)).css("-webkit-text-stroke-color",getRandomColor());
+
+  }
+
+ //text-shadow: 7px 7px ${zz}
+   // $(".letter-1").css("-text-shadow","7px 7px "+getRandomColor());
+*/
+
+  velocityChangeColor=25;
+  if(n("velocityFlash")>=500) velocityChangeColor=15;
+
+  setTimeout(function(){ changeColor(); },velocityChangeColor);
+
+}
+
+//changeColor();
+
+// alert(colored("hola"));
+
+function quitaAcentos(str){ 
+  for (var i=0;i<str.length;i++){ 
+  //Sustituye "á é í ó ú" 
+    if (str.charAt(i)=="á") str = str.replace(/á/,"a"); 
+    if (str.charAt(i)=="é") str = str.replace(/é/,"e"); 
+    if (str.charAt(i)=="í") str = str.replace(/í/,"i"); 
+    if (str.charAt(i)=="ó") str = str.replace(/ó/,"o"); 
+    if (str.charAt(i)=="ú") str = str.replace(/ú/,"u"); 
+    // if (str.charAt(i)=="ñ") str = str.replace(/ñ/,"n"); 
+  } 
+  return str; 
+} 
+
+//$("#down-screen")
+
+myTransformation=1;
+
+function cambiarTransformation(x){
+  myTransformation=parseInt(x);
+}
+
+
+totalSwap=3;
+x66=0;
+swapMode=0;
+prevPosicion=-1;
+prevImg=-1;
+
+//swap
+
+function swap(){
+
+  if(!bSwap) return;
+   try{
+    if(array_img_swap[posicion-1].length>0){}
+
+  }catch(err) { setTimeout(function(){ swap(); }, 1/*_.random(1,20)*/); return; }
+  
+   if(swapMode==0){
+
+    ///*if(x66==array_img_swap[posicion-1].length){ console.log("shuffle");*/ array_img_swap[posicion-1]=_.shuffle(array_img_swap[posicion-1]);/* }*/
+    //prevPosicion=posicion-1;  
+
+
+    //$("#img-1").html(array_img_swap[posicion-1][0]);
+    x66=0;
+    for(;;){
+      //array_img_swap[posicion-1]=_.shuffle(array_img_swap[posicion-1]);
+      rnd_swap=_.random(0,array_img_swap[posicion-1].length-1);
+
+      __myImg=array_img_swap[posicion-1][rnd_swap];
+      __myText=array_text_swap[posicion-1][rnd_swap];
+
+      if(__myImg!=prevImg) break;
+      if(array_img_swap[posicion-1].length==1) break;
+       if(x66==100) break;
+      x66++;
+    }
+
+    prevImg=__myImg;
+     // if(/*array_img_swap[posicion-1][0].length!=50 &&*/ prevImg!=array_img_swap[posicion-1][0]){ 
+        // $("#img-1").html(array_img_swap[posicion-1][0]); 
+        $("#img-1").html(__myImg); 
+      //  prevImg=array_img_swap[posicion-1][0]; 
+        if(bSwapText) $(".myTxt").html(__myText)
+        //break;
+     // }
+
+      
+
+     
+
+    //}
+    
+    //$("#img-3").html(array_img_swap[posicion-1][2]);
+
+    /*x66++;*/
+
+
+   } 
+   if(swapMode==1){
+
+    if(x66==array_img_swap[posicion-1].length){
+      x66=0;
+    }
+
+    if(array_img_swap[posicion-1][0].length!=50) $("#img-1").html(array_img_swap[posicion-1][x66]);
+
+
+    x66++;
+   }  
+
+   setTimeout(function(){ swap(); }, 1 /*_.random(1,20)*/);
+
+}
+
+swap();
+
+
+/*
+setInterval(function(){
+ 
+
+},5)
+
+*/
+/*
+const e = React.createElement;
+
+React.render(
+  e('div', null, 'Hello World'),
+  document.getElementById('root')
+);
+
+*/
+
+/*
+var Hello = React.createClass({
+  displayName: 'Hello',
+  render: function() {
+    return React.createElement("div", null, "Hello ", this.props.name);
+  }
+});
+
+ReactDOM.render(
+  React.createElement(Hello, {name: "World"}),
+  document.getElementById('up-screen')
+);
+*/
+
+currentColor="green";
+
+function cambiarColores(x){
+  if(x==1){ bColors=0; currentColor="green";  }
+  if(x==2){ bColors=0; currentColor="blue"; }
+  if(x==3){ bColors=0; currentColor="gray"; }
+  if(x==4){ bColors=1; bRc=0; }
+  if(x==5){ if(bColors==0){ bColors=1; } bRc=1; clearTimeout(killIntervalRc); }
+  $("body").css("color",currentColor);
+}
+
+
+var contadorRnd;
+function getRndTxt(){
+    contadorRnd++;
+    if(contadorRnd>12)
+      return;
+
+    $.ajax({url: "http://leerencolores.appspot.com/multiReader2?rnd=1&libro=aleatory&cPage=aleatory", success: function(result){
+        $("#input1").val(result);
+       // mode=1; bPrev=0; bNext=0;  play();
+       stopFlash();
+    }});
+}
+
+cambiarColores(1);
+
+String.prototype.regexIndexOf = function(regex, startpos) {
+    var indexOf = this.substring(startpos || 0).search(regex);
+    return (indexOf >= 0) ? (indexOf + (startpos || 0)) : indexOf;
+}
+
+String.prototype.regexLastIndexOf = function(regex, startpos) {
+    regex = (regex.global) ? regex : new RegExp(regex.source, "g" + (regex.ignoreCase ? "i" : "") + (regex.multiLine ? "m" : ""));
+    if(typeof (startpos) == "undefined") {
+        startpos = this.length;
+    } else if(startpos < 0) {
+        startpos = 0;
+    }
+    var stringToWorkWith = this.substring(0, startpos + 1);
+    var lastIndexOf = -1;
+    var nextStop = 0;
+    while((result = regex.exec(stringToWorkWith)) != null) {
+        lastIndexOf = result.index;
+        regex.lastIndex = ++nextStop;
+    }
+    return lastIndexOf;
+}
+
+
+
+_ww=$(window).width();
+if(_ww<=1000){
+
+
+  // $("#control").css("height","100px;")
+  //$("#control").css("zoom","3")
+  //$("#center-screen").css("zoom","3")
+  // $("#center-screen").css("margin-bottom","100px;")
+  //$("#control").css("z-index","1000")
+}
+
+
+//! init config initials values
+
+$("#velocityFlash").val("400");
+$("#animation").val("1");
+$("#repeat-w").val("0");
+$("#wordsByFlash").val("1");
+wordsByFlash=n('wordsByFlash');
+if(wordsByFlash>1){
+  $("#animation").val("0");
+  $("#velocityFlash").val("500");
+} 
+calcularTiempo();
+
+var readingMode=6;
+
+cadena=[]
+i=0;
+cadena[0]="love";
+_palabra = quitaAcentos(cadena[i].toLowerCase().split(" ").join(""));
+v = `/${_palabra}/i`;
+//console.log(v)
+re = new RegExp (v, "g");
+
+keyCount=0;
+direccion=0;
+$(document).keydown(function(e) {
+  prevDir=direccion;
+
+  //console.log(e.which);
+  
+
+    switch(e.which) {
+
+        case 37: // left
+          direccion=0;
+
+          if(posicion-2*wordsByFlash>=0) posicion-=2*wordsByFlash; else posicion=0;
+          init();
+          
+        break;
+
+         case 65: // left
+          direccion=0;
+          
+        break;
+
+        case 38: // up
+          direccion=2;
+          cadena=_.shuffle(cadena2);
+        break;
+
+        case 87: // up
+          direccion=2;
+        break;
+
+        case 39: // right
+          direccion=1;
+
+          introMode=2;
+
+          if(keyCount==0){
+
+            _.once(play());
+            keyCount++;
+
+
+            return;
+
+
+          }
+          init();
+          
+        break;
+
+        case 68: // right
+          direccion=1;
+        break;
+
+        case 40: // down
+          direccion=3;
+           $(".myTxt").show();
+          
+        break;
+
+        case 83: // down
+          direccion=3;
+          
+        break;
+
+        default: return; // exit this handler for other keys
+
+
+    }
+
+    e.preventDefault(); // prevent the default action (scroll / move caret)
+});
+
+
+//console.log( "love".search(re) );
+
+
+_xxx=1;
+
+//efects flip
+ myXX=1;
+
+
+//!
+setInterval(function(){
+
+  if(animation_system!=11){  $("img").css("transform", "scaleY(1)"); return; }
+  
+  if(bTts) return;
+  //if(wordsByFlash>1) return;
+
+  if(_.random(0,1)) x="-1"; else x="1";
+
+  if(_xxx==1) _xxx=0; else _xxx=1;
+
+  if(_xxx) x="-1"; else x="1";
+
+  myXX=!myXX;
+
+  //if(myXX){ $(".show1").show(); $(".show2").hide(); }else{  $(".show2").show(); $(".show1").hide(); }
+
+ //gray scale 
+ //if(myXX){ $("img").css("-webkit-filter", "grayscale(0%)"); }else{ $("img").css("-webkit-filter", "grayscale(100%)"); }
+ //if(_.random(0,1)){ $("img").css("-webkit-filter", "grayscale(0%)"); }else{ $("img").css("-webkit-filter", "grayscale(100%)"); }
+  
+
+ // invert
+ //if(_.random(0,1)) x66="0%"; else x66="100%"; $("img").css("-webkit-filter", "invert("+x66+")"); 
+
+
+
+ //flip
+
+  if(_.random(0,1)){
+    $("img").css("transform", "scaleX("+x+")")
+
+  }else{
+   $("img").css("transform", "scaleY("+x+")")
+
+  }
+  
+},20)
+
+
+
+// setInterval(function(){
+//   myXX=!myXX;
+//   if(myXX){ $("img").css("-webkit-filter", "grayscale(0%)"); }else{ $("img").css("-webkit-filter", "grayscale(100%)"); }
+  
+// },25)
+
+String.prototype.shuffle = function () {
+    var a = this.split(""),
+        n = a.length;
+
+    for(var i = n - 1; i > 0; i--) {
+        var j = Math.floor(Math.random() * (i + 1));
+        var tmp = a[i];
+        a[i] = a[j];
+        a[j] = tmp;
+    }
+    return a.join("");
+}
+
+// setInterval(function(){
+//   t=$("#txtFlash").html();
+//   t=t.shuffle();
+//   $("#txtFlash").html(t);
+
+// },25);
+
+
+
+function getCleanedString(cadena){
+   // Definimos los caracteres que queremos eliminar
+   var specialChars = "!@#$^&%*()+=-[]\/{}|:<>?,. ";
+
+   // Los eliminamos todos
+   for (var i = 0; i < specialChars.length; i++) {
+       cadena= cadena.replace(new RegExp("\\" + specialChars[i], 'gi'), '');
+   }   
+
+   // Lo queremos devolver limpio en minusculas
+   cadena = cadena.toLowerCase();
+
+   // Quitamos espacios y los sustituimos por _ porque nos gusta mas asi
+   //cadena = cadena.replace(/ /g,"_");
+
+   // Quitamos acentos y "ñ". Fijate en que va sin comillas el primer parametro
+   /*
+   cadena = cadena.replace(/á/gi,"a");
+   cadena = cadena.replace(/é/gi,"e");
+   cadena = cadena.replace(/í/gi,"i");
+   cadena = cadena.replace(/ó/gi,"o");
+   cadena = cadena.replace(/ú/gi,"u");
+   cadena = cadena.replace(/ñ/gi,"n");*/
+   return cadena;
+}
+
+function getRandomColor() {
+
+    return `rgb(${_.random(200,255)},${_.random(200,255)},${_.random(200,255)})`;
+    var letters = '0123456789ABCDEF';
+    var color = '#';
+    for (var i = 0; i < 6; i++ ) {
+        color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
+}
+
+function playNote(note,off){
+
+  //off=0.25;
+
+   var delay = 0; // play one note every quarter second
+     // var note = 51; // the MIDI note
+      var velocity = 127; // how hard the note hits
+      // play the note
+      MIDI.setVolume(0, 127);
+      MIDI.noteOn(0, note, velocity, delay);
+      MIDI.noteOff(0, note, delay + off);
+}
+
+
+var elemento=0,myWord="";
+repeatCount=0;
+var rnd9;
+pasadas=0;
+arrayKill=[];
+var kill7;
+
+function playWord(myW){
+
+  if(myW=="") return;
+  if(myW==null) return;
+
+  arrayKill=[];
+  /*
+  if(repeatVal>1 && repeatCount<repeatVal && repeatCount!=0){
+
+    repeatCount++; 
+  }else{
+    pasadas++;
+
+    // for(;;){
+    //   repeatCount=1;
+    //   rnd=_.random(0,cantidadGo-1);
+
+    //   if(arrayP1[rnd][1]) break;
+
+    // }
+
+    if(typeTask==-1) rnd=pasadas;
+
+  }*/
+
+  
+
+  //$(".allW").css("color","black");
+  //$("#w-"+rnd).css("color","green");
+  
+  // myWord=arrayP1[rnd][0];
+  myWord=myW;
+  //console.log(myWord);
+  myWordDelay=(_time-10)/myWord.length;//n("setAllTo-"+rnd);
+  wordDelay=0;//n("delaySpace");
+  
+
+  myWordArray=myWord.split("");
+
+  acum=0;
+  for(i=0;i<myWordArray.length;i++){
+
+    if(myWordArray[i]=="ñ" || myWordArray[i]=="Ñ") myWordArray[i]="nn";
+
+    
+    if(i==0){
+      if(myWordDelay!=0) playNote(_l4["espacio"],myWordDelay-10);  //ll["espacio"].play();
+      if(ll[myWordArray[i]] != null && myWordArray[i]!="") playNote(_l4[myWordArray[i]],myWordDelay-10); // ll[myWordArray[i]].play();
+
+      _p=myWordArray[i] + "-" + getIntervaloFinal(myWordArray[i], " ") + "-" + lll[myWordArray[i]];
+
+      $("#output").html(_p);
+
+    }else{
+
+      //return; //quitar
+
+      eval(`
+        arrayKill[${i}]=setTimeout(function(){ 
+          if(!bPlay) return;  
+
+          _p=myWordArray[${i}] + "-" + getIntervaloFinal(myWordArray[${i}], myWordArray[${i-1}]) + "-" + lll[myWordArray[${i}]];
+
+          $("#output").html(_p);
+
+          //ll[myWordArray[${i}]].play(); 
+          playNote(_l4[myWordArray[${i}]],myWordDelay-10);
+
+          //setTimeout(function(){ ll[myWordArray[${i}]].pause();  },50);
+
+
+        },${i}*myWordDelay);
+
+      `);
+
+    }  
+  }
+
+  if ( $("#ttsOn").is(':checked')){
+     kill1=setTimeout(function(){
+
+
+     try {
+
+
+          if ( !!window.chrome  ) {
+            
+    
+              
+            msg = new SpeechSynthesisUtterance(myWord);
+                      
+            
+            msg.rate = n("velocity1");
+            msg.volume = f("volumeTts");
+            if(language)
+              msg.voice = currentEnglishVoice;
+            else{
+              msg.voice = currentSpanishVoice;
+            }
+           
+              window.speechSynthesis.speak(msg);
+          }else{
+    
+              var utterThis = new SpeechSynthesisUtterance(myWord);           
+            
+            utterThis.volume = f("volumeTts");
+            if(language)
+              utterThis.voice = currentEnglishVoice;
+            else{
+              utterThis.voice = currentSpanishVoice;
+            }
+            var synth = window.speechSynthesis;
+          
+             synth.speak(utterThis)
+          } 
+       }catch(err) {}
+    
+
+    },myWordArray.length*myWordDelay);
+
+
+  }
+
+ 
+
+  // kill7=setTimeout(function(){
+  //   playWord();
+
+  // },myWordArray.length*myWordDelay+wordDelay);
+
+}
+
+
+function puntajeLetra(letra){
+
+  letra = letra.toLowerCase();
+
+  if (letra == "á"){
+    letra = "a";
+  }
+  if (letra == "é"){
+    letra = "e";
+  }
+  if (letra == "í"){
+    letra = "i";
+  }
+  if (letra == "ó"){
+    letra = "o";
+  }
+  if (letra == "ú"){
+    letra = "u";
+  }
+
+  for(var i = 0; i < medida1.length; i++) {
+    if (medida1.charAt(i,1) == letra){
+      
+
+      return i;
+    } 
+
+  }
+
+
+}
+
+
+function medir(letra1,letra2){
+
+
+  puntaje1 = puntajeLetra(letra1);
+  puntaje2 = puntajeLetra(letra2);
+
+  medida = puntaje1 - puntaje2;
+
+  if(medida<0){ medida = medida * -1; } 
+
+  if(letra1 == " " && letra2 != " "){ medida += 2; }
+  if(letra2 == " " && letra1 != " "){ medida += 2; }
+
+
+  return medida; 
+
+}
+
+function getIntervalo(puntaje){
+
+
+  if(puntaje==1){ return "2da menor"; }
+  if(puntaje==2){ return "2da mayor"; }
+  if(puntaje==3){ return "3ra menor"; }
+  if(puntaje==4){ return "3ra mayor"; }
+  if(puntaje==5){ return "4ta justa"; }
+  if(puntaje==6){ return "4ta aumentada"; }
+  if(puntaje==7){ return "5ta justo"; }
+  if(puntaje==8){ return "6ta menor"; }
+  if(puntaje==9){ return "6ta mayor"; }
+  if(puntaje==10){ return "7ma menor"; }
+  if(puntaje==11){ return "7ma mayor"; }
+  if(puntaje==12){ return "8va"; }
+  if(puntaje==13){ return "9na menor"; }
+  if(puntaje==14){ return "9na mayor"; }
+  if(puntaje==15){ return "10 menor"; }
+  if(puntaje==16){ return "10 mayor"; }
+  if(puntaje==17){ return "11va justa"; }
+  if(puntaje==18){ return "11º  aumentada"; }
+  if(puntaje==19){ return "12º justa"; }
+  if(puntaje==20){ return "13º menor"; }
+  if(puntaje==21){ return "13º mayor"; }
+  if(puntaje==22){ return "14º menor"; }
+  if(puntaje==23){ return "14º mayor"; }
+  if(puntaje==24){ return "2 octavas"; }
+  if(puntaje==25){ return "2 octavas + 2da menor"; }
+  if(puntaje==26){ return "2 octavas + 2da mayor"; }
+  if(puntaje==27){ return "2 octavas + 3ra menor"; }
+  if(puntaje==28){ return "2 octavas + 3ra mayor"; }
+  if(puntaje==29){ return "2 octavas + 4ta justa"; }
+  if(puntaje==30){ return "2 octavas + 4ta aumentada"; }
+
+  return puntaje;
+
+}
+
+function getIntervaloFinal(letra1,letra2){
+
+  medida = medir(letra1,letra2);
+  retornar = getIntervalo(medida);
+
+  return retornar;
+}
+
+function actualizaSetAll(){
+
+  // setTimeout(function(){
+    for(i=0;i<100;i++){
+
+      $("#setAllTo-"+i).val($("#setAllTo").val());
+
+    }
+
+
+  // },1);
+
+  
+}
+
+
+
+
+typeTask=0;
+repeatVal=1;
+repeatDelay=1;
+
+function mu(){
+
+  x=$("#input1").val();
+  s="";
+  for(i=0;i<100;i++){
+    s+=x;
+  }
+  $("#input1").val(s);
+
+}
+
+
+function limpiarTexto(x){
+
+  var limpia="";
+
+   limpia = x.split("\n").join(" ");
+    limpia = limpia.split("\t").join(" ");
+    limpia = limpia.split("\r").join(" ");
+    limpia = limpia.split(",").join(" ");
+    limpia = limpia.split(".").join(" ");
+    limpia = limpia.split(")").join(" ");
+    limpia = limpia.split("(").join(" ");
+    limpia = limpia.split(";").join(" ");
+    limpia = limpia.split(":").join(" ");
+    limpia = limpia.split("-").join(" ");
+    // limpia = limpia.split("ñ").join("nn");
+    limpia = limpia.split("”").join(" ");
+    limpia = limpia.split("“").join(" ");
+    limpia = limpia.split("—").join(" ");
+    limpia = limpia.split("«").join(" ");
+    limpia = limpia.split("«").join(" ");
+    limpia = limpia.split("»").join(" ");
+    limpia = limpia.split("‘").join(" ");
+    limpia = limpia.split("...").join(" ");
+    limpia = limpia.split("…").join(" "); // 3 puntos en un solo bloque 
+    limpia = limpia.split("\"").join(" ");
+    limpia = limpia.split("–").join(" ");
+    limpia = limpia.split("'").join(" ");
+    limpia = limpia.split("¡").join(" ");
+    limpia = limpia.split("!").join(" ");
+    limpia = limpia.split("¿").join(" ");
+    limpia = limpia.split("?").join(" ");
+    limpia = limpia.split("ü").join("u");
+
+    return limpia;
+}
+
+var bDescanso=0;
+var colorDescanso="";
+var tiempoDescanso=0;
+
+//descanso ojos descansar
+function descanso(){
+
+  tiempoDescanso=500;
+  bDescanso=1;
+  //colorDescanso=`color:red;`;
+  // colorDescanso="color:green;";
+  
+  
+  setTimeout(function(){ descanso(); },6000)
+  //setTimeout(function(){},tiempoDescanso)
+
+}
+
+//descanso();
+
+function newAgrupation(){
+
+  if(n("agrupationImages")!=0)  $("#velocity2").show();  else $("#velocity2").hide();
+
+}
+
+
+function limpiarCue(x){
+  str=x;
+  limpia = str.split("\n").join(" ");
+    limpia = limpia.split("\t").join(" ");
+    limpia = limpia.split("\r").join(" ");
+    limpia = limpia.split(",").join(" ");
+    limpia = limpia.split(".").join(" ");
+    limpia = limpia.split(")").join(" ");
+    limpia = limpia.split("(").join(" ");
+    limpia = limpia.split(";").join(" ");
+    limpia = limpia.split(":").join(" ");
+    limpia = limpia.split("-").join(" ");
+    limpia = limpia.split("nn").join("ñ");
+    limpia = limpia.split("”").join(" ");
+    limpia = limpia.split("“").join(" ");
+    limpia = limpia.split("—").join(" ");
+    limpia = limpia.split("«").join(" ");
+    limpia = limpia.split("«").join(" ");
+    limpia = limpia.split("»").join(" ");
+    limpia = limpia.split("‘").join(" ");
+    limpia = limpia.split("...").join(" ");
+    limpia = limpia.split("…").join(" "); // 3 puntos en un solo bloque 
+    limpia = limpia.split("\"").join(" ");
+    limpia = limpia.split("–").join(" ");
+    limpia = limpia.split("'").join(" ");
+    limpia = limpia.split("¡").join(" ");
+    limpia = limpia.split("!").join(" ");
+    limpia = limpia.split("¿").join(" ");
+    limpia = limpia.split("?").join(" ");
+    limpia = limpia.split("ü").join("u");
+    limpia = limpia.split(">").join(" ");
+    limpia = limpia.split("  ").join(" ");
+    limpia = limpia.split("  ").join(" ");
+
+    return limpia;
+
+}
+
+newAgrupation();
+/*
+setTinterval(function(){
+
+  
+},0)*/
+</script>
+<script src="js/controller.js"></script>
+<!-- <script src="js/midi/soundfont.js" type="text/javascript"></script>  -->
+
+</body>
+</html>
