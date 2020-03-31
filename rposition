@@ -4,7 +4,25 @@
 
   <meta charset="UTF-8">
   <meta name="viewport" content="user-scalable=no">
-  <title>read in space</title>
+
+  <link rel="icon" href="favicon.jpg" type="image/jpg"/>
+  <link rel="shortcut icon" href="favicon.jpg" type="image/jpg" />
+
+  <? if(isset($_GET["en"])){ ?>  
+
+  <title>rspace-MindMap Reading</title>
+    
+  <meta name="description" content="Read texts with mental maps">
+  <meta name="keywords" content="mindmap, text ,reading"> 
+
+  <? }else{ ?>
+
+  <title>rspace-Leer con Mapas Mentales</title>
+    
+  <meta name="description" content="Leer Textos como mapas mentales">
+  <meta name="keywords" content="mindmap, mapas mentales ,leer, lectura"> 
+
+  <? } ?>
 
   <script src="js/jquery.min.js"></script>
   <script src="js/underscore-min.js"></script>
@@ -22,7 +40,8 @@
 <div id="control" style="position: fixed; bottom: 0px; left: 0px;">
    <span id="paginator"></span><script type="text/javascript">newSel("myPage","paginator",1,35,1,1,`getPage(this.value);`,"","page ");</script>  
    <span id="cantidad-span"></span><script type="text/javascript">newSel("cantidad","cantidad-span",1,50,1,9,`show();`,"","e");</script>  
-   <a href="#" onclick="alert('Read in space\n\nclick of left or right of screen to next or previous position, right click to reload curren position\n\nrobertchalean@gmail.com ');">[?]</a>
+   <a href="#" onclick="window.location=myLang;" id="goto-lang" style="/*display: none;*/"></a>
+   <a href="#" onclick="alert('rspace - Mind map reading\n\nclick of left or right of screen to next or previous position, right click to reload curren position\n\nrobertchalean@gmail.com\n\nhttps://github.com/vernetit/ideas/blob/master/rposition');">[?]</a>
    <!-- <textarea rows="1" cols="25" style="margin-top: 5px; display: none;" id="input1" class="esconder"></textarea> -->
 </div>
 
@@ -42,6 +61,10 @@ function printMousePos(event) {
     clientX = event.clientX;
     clientY = event.clientY;
 
+    var hhh=$(window).height()
+
+    if(clientY>hhh-100) return;
+
     if(clientX<(ww/2)){ show(0); }
     if(clientX>=(ww/2)){ show(1); }
 
@@ -56,17 +79,6 @@ document.addEventListener('contextmenu', function(ev) {
 
 var contadorRnd;
 
-function getRndTxt(){
-    contadorRnd++;
-    if(contadorRnd>=5)
-      return;
-
-    $.ajax({url: "https://leerencolores.appspot.com/multiReader2?rnd=1&libro=hp3.html&cPage=aleatory", success: function(result){
-        $("#input1").val(result);
-       // mode=1; bPrev=0; bNext=0;  play();
-       
-    }});
-}
 
 var cadena;
 
@@ -77,7 +89,7 @@ function getPage(x){
     
     $("#center-screen").append("<br>Loading page...");
 
-    $.ajax({url: "https://leerencolores.appspot.com/multiReader2?rnd=1&libro=hp3.html&cPage="+x, success: function(result){
+    $.ajax({url: "https://leerencolores.appspot.com/multiReader2?rnd=1&libro=<?=isset($_GET["en"])?"hp3e.html":"hp3.html"?>&cPage="+x, success: function(result){
        // $("#input1").val(result);
         //$("#center-screen").append("<br>Page loaded you can press play!");
         // $("#center-screen").append("<br>");
@@ -191,6 +203,19 @@ function show(x=2){
 
   }
 }
+
+
+myLang=((window.location+"").replace("#",""))+"&en=1";
+$("#goto-lang").html("English");
+
+<? if(isset($_GET["en"])){ ?>  
+
+myLang=(window.location+"").split("&")[0];
+
+$("#goto-lang").html("Spanish");
+
+<? } ?>
+
 
 inicio=0;
 cantidad=9;
