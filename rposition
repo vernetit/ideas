@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="user-scalable=no">
+  <title>read in space</title>
+
+  <script src="js/jquery.min.js"></script>
+  <script src="js/underscore-min.js"></script>
+   <script src="js/utilidades.js" type="text/javascript"></script>
+
+  <style type="text/css"></style>
+
+</head>
+<body>
+
+<!-- width="1024" height="860" -->
+<canvas id="myCanvas"></canvas> 
+
+
+<div id="control" style="position: fixed; bottom: 0px; left: 0px;">
+   <span id="paginator"></span><script type="text/javascript">newSel("myPage","paginator",1,35,1,1,`getPage(this.value);`,"","page ");</script>  
+   <span id="cantidad-span"></span><script type="text/javascript">newSel("cantidad","cantidad-span",1,50,1,9,`show();`,"","e");</script>  
+   <a href="#" onclick="alert('Read in space\n\nclick of left or right of screen to next or previous position, right click to reload curren position\n\nrobertchalean@gmail.com ');">[?]</a>
+   <!-- <textarea rows="1" cols="25" style="margin-top: 5px; display: none;" id="input1" class="esconder"></textarea> -->
+</div>
+
+
+<script type="text/javascript">
+
+
+c = document.getElementById("myCanvas");
+ctx = c.getContext("2d");
+
+
+clientX=0; clientY=0;
+function printMousePos(event) {
+
+    ww=$(window).width();
+
+    clientX = event.clientX;
+    clientY = event.clientY;
+
+    if(clientX<(ww/2)){ show(0); }
+    if(clientX>=(ww/2)){ show(1); }
+
+}
+
+document.addEventListener("click", printMousePos);  
+document.addEventListener('contextmenu', function(ev) {
+    ev.preventDefault();
+    show();
+    return false;
+}, false);
+
+var contadorRnd;
+
+function getRndTxt(){
+    contadorRnd++;
+    if(contadorRnd>=5)
+      return;
+
+    $.ajax({url: "https://leerencolores.appspot.com/multiReader2?rnd=1&libro=hp3.html&cPage=aleatory", success: function(result){
+        $("#input1").val(result);
+       // mode=1; bPrev=0; bNext=0;  play();
+       
+    }});
+}
+
+var cadena;
+
+function getPage(x){
+    contadorRnd++;
+    if(contadorRnd>=100)
+      return;
+    
+    $("#center-screen").append("<br>Loading page...");
+
+    $.ajax({url: "https://leerencolores.appspot.com/multiReader2?rnd=1&libro=hp3.html&cPage="+x, success: function(result){
+       // $("#input1").val(result);
+        //$("#center-screen").append("<br>Page loaded you can press play!");
+        // $("#center-screen").append("<br>");
+       // mode=1; bPrev=0; bNext=0;  play();
+
+      limpia = result.split("\n").join(" ");
+
+      limpia = limpia.split("\t").join(" ");
+      limpia = limpia.split("]").join(" ");
+      limpia = limpia.split("[").join(" ");
+      limpia = limpia.split("}").join(" ");
+      limpia = limpia.split("{").join(" ");
+      limpia = limpia.split("\r").join(" ");
+      limpia = limpia.split(",").join(" ");
+      limpia = limpia.split(".").join(" ");
+      limpia = limpia.split(")").join(" ");
+      limpia = limpia.split("(").join(" ");
+      limpia = limpia.split(";").join(" ");
+      limpia = limpia.split(":").join(" ");
+      limpia = limpia.split("-").join(" ");
+      // limpia = limpia.split("ñ").join("nn");
+      limpia = limpia.split("”").join(" ");
+      limpia = limpia.split("“").join(" ");
+      limpia = limpia.split("—").join(" ");
+      limpia = limpia.split("«").join(" ");
+      limpia = limpia.split("«").join(" ");
+      limpia = limpia.split("»").join(" ");
+      limpia = limpia.split("‘").join(" ");
+      limpia = limpia.split("...").join(" ");
+      limpia = limpia.split("…").join(" "); // 3 puntos en un solo bloque 
+      limpia = limpia.split("\"").join(" ");
+      limpia = limpia.split("–").join(" ");
+      limpia = limpia.split("'").join(" ");
+      limpia = limpia.split("¡").join(" ");
+      limpia = limpia.split("!").join(" ");
+      limpia = limpia.split("¿").join(" ");
+      limpia = limpia.split("?").join(" ");
+      limpia = limpia.split("ü").join("u");
+
+      limpia = limpia.split(">").join(" ");
+
+      limpia = limpia.split("   ").join(" ");
+      limpia = limpia.split("  ").join(" ");
+    
+      cadena=limpia.split(" ");
+
+      cadena2=[];
+      var index=0;
+      for(i=0;i<cadena.length;i++){
+
+        if(cadena[i].length>0){ cadena2[index]=cadena[i]; index++; } 
+      }
+
+      cadena=_.extend(cadena2);
+
+      inicio=0;
+      cantidad=n("cantidad");
+
+      show();
+
+       
+    }});
+}  
+
+function show(x=2){
+
+  if(x==1){ inicio+=cantidad; }
+  if(x==0 && (inicio-cantidad)>=0  ){ inicio-=cantidad; }
+
+  www=$(window).width()-100;
+  hhh=$(window).height()-100;
+  c.width  = www;
+  c.height = hhh;
+
+  ctx.clearRect(0, 0, c.width, c.height);
+
+  arrP=[];
+  fin=inicio+n("cantidad");
+
+  pXOld=-1;
+  pYOld=-1;
+
+  for(var i=inicio;i<fin;i++){
+
+  
+    //console.log(cadena[i].length) 
+
+    pX=_.random(50,www-100);
+    pY=_.random(50,hhh-50);
+
+    ctx.font = "30px Arial";
+    if(i==inicio){ ctx.fillStyle = "red"; }else{  ctx.fillStyle = "green";  }
+    cw=parseInt( ctx.measureText(cadena[i]).width )
+    ctx.fillText(cadena[i], pX, pY);
+    
+    if(i>inicio){
+
+      ctx.fillStyle = "black";
+      ctx.beginPath();
+      ctx.moveTo(pXOld+w/2 , pYOld-30);
+      ctx.lineTo(pX+cw/2, pY-30);
+      ctx.stroke();
+
+    }
+
+    var w=parseInt( ctx.measureText(cadena[i]).width )
+    console.log(w)
+
+    pXOld=pX;
+    pYOld=pY;
+
+  }
+}
+
+inicio=0;
+cantidad=9;
+
+getPage(0);
+
+
+/*
+function start(x){
+
+  if(x==0){
+
+  }
+}*/
+
+
+
+
+
+</script>
+
+</body>
+</html>
