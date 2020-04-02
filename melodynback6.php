@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"/>
   <title>Melody N-back 6</title>
 
+   <meta name="description" content="N-back Music Ear Training">
+    <meta name="keywords" content="dual n-back, ear training, working memory">
+
   <script src='js/jquery.min.js'></script>
   <script src="js/underscore-min.js"></script>  
   <!-- <script src="js/Tone.min.js"></script> -->
@@ -96,15 +99,15 @@
 
       </style> 
       <script>
-    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
-    ga('create', 'UA-45359665-6', 'auto');
-    ga('send', 'pageview');
+      ga('create', 'UA-45359665-5', 'auto');
+      ga('send', 'pageview');
 
-  </script>
+    </script>
 </head>
 <body>
 <div id="fb-root"></div>
@@ -116,11 +119,15 @@
   fjs.parentNode.insertBefore(js, fjs);
 }(document, 'script', 'facebook-jssdk'));</script>
 <div id="controls">
-<b><span style="font-size: 40px" id="logo-span">𝄞</span> <!--<span style="font-size: 40px">𝄢</span>--></b> 
-<a href="#" id="mas" style="text-decoration:none; color: #7D0552;"><b>+</b></a> 
+<b><span style="font-size: 40px" id="logo-span" class="hide-on-play">𝄞</span> <!--<span style="font-size: 40px">𝄢</span>--></b> 
+<a href="#" id="mas" style="text-decoration:none; color: #7D0552;" class="hide-on-play"><b>+</b></a> 
 <b><span id="cantidadBack">2</span></b>
-<a href="#" id="menos"  style="text-decoration:none; color: #7D0552;"><b>-</b></a>
+<a href="#" id="menos"  style="text-decoration:none; color: #7D0552;" class="hide-on-play"><b>-</b></a>
 <b class="back-b">Back</b>&nbsp;
+<b>
+ <a href="#" id="start" onclick="play(-1)" id="play-btn1" style="text-decoration: none; color: black;" class="hide-on-play">▶</a>
+ <a href="#" id="stop1" style="text-decoration: none; color: black;">■</a>
+</b>
 <span id="tono-span">
   <select id="tone-sel" style="display:none;">
     <option value="-1" selected>random</option>
@@ -150,8 +157,8 @@
     <option value="23">B</option>
   </select>
 </span>
-<span id="scale-span" style="/*display:none;*/"></span>
-<span id="max-span">
+<span id="scale-span" style="/*display:none;*/" class="hide-on-play"></span>
+<span id="max-span" class="hide-on-play">
   <select id="max-interval-sel" style="/*display:none;*/">
     <option value="1">m2</option>
     <option value="2">M2</option>
@@ -179,7 +186,7 @@
     <option value="24">P15</option>
   </select>
 </span>
-<span id="quantity-notes-span">
+<span id="quantity-notes-span" class="hide-on-play">
   <select id="quantity-notes-sel">
     <option value="1">1</option>
     <option value="2">2</option>
@@ -217,15 +224,15 @@
     <option value="34">34</option>
   </select>
 </span>
-<span id="delay-note-span">
+<span id="delay-note-span"  class="hide-on-play">
   <select id="delay-note-sel">
     <option value="50">0.05</option>
     <option value="100">0.1</option>
     <option value="150">0.15</option>
     <option value="200">0.2</option>
-    <option value="250">0.25</option>
+    <option value="250" selected>0.25</option>
     <option value="300">0.3</option>
-    <option value="400"  selected>0.4</option>
+    <option value="400">0.4</option>
     <option value="500">0.5</option>
     <option value="600">0.6</option>
     <option value="700">0.7</option>
@@ -240,25 +247,45 @@
     <option value="2">2 voices</option>
   </select>
 </span>
-<b>
- <a href="#" id="start" onclick="play(-1)" id="play-btn1" style="text-decoration: none; color: black;">▶</a>
- <a href="#" id="stop1" style="text-decoration: none; color: black;">■</a>
-</b>
- <span style="/*display:none;*/">
- <span><input type="text" value="3000" id="timeValue" style="width: 30px;"></span>
- </span>
- [<span id="pasadas">20</span>]&nbsp;
+ <span>
 
-<select id="tricky" style="width: 45px; display:none;">
+  <select id="timeValue" style="/*width: 30px;*/" class="hide-on-play">
+    <option value="10">0.1s</option>
+    <option value="1000">1s</option>
+    <option value="1500">1.5s</option>
+    <option value="2000">2</option>
+    <option value="2500">2.5s</option>
+    <option value="3000" selected>3s</option>
+    <option value="3500">3.5s</option>
+    <option value="4000">4s</option>
+    <option value="4500">4.5s</option>
+    <option value="5000">5s</option>
+    <option value="5500">5.5s</option>
+    <option value="6000">6s</option>
+  </select>
+
+  <!-- <input type="text" value="3000" id="timeValue" style="width: 30px;" class="hide-on-play"> -->
+
+ </span>
+
+ <span style="/*display:none;*/">
+
+ </span>
+ <select id="tricky" style="width: 45px; display:none;">
     <option value="0" selected>no tricky</option>
     <option value="12">12%</option>
     <option value="25">25%</option>
     <option value="37">37%</option>
     <option value="50">50%</option>
 </select>
+  <div id="stats-1" style="display: inline;">
+ [<span id="pasadas">20</span>]&nbsp;
+
+
 
  <span class="oke">[<span id="ok">0</span>&nbsp;|&nbsp;</span>
  <span class="oke"><span id="error">0</span>]&nbsp;</span>
+ </div>
 
  <span style="display:none;"> %: <input type="text" value="20" id="rndPorcentaje" style="width: 25px;">&nbsp; <!--deffault: 20--> </span>
 
@@ -271,7 +298,7 @@ loop <input type="checkbox" onclick="bLoop=!bLoop"1>
 </span>
 
 <? /*include "otherNback.php"; */ ?>
-<a href="#" onclick="alert('Melody N-Back\To learn the n-back trainning please find Brain Workshop tutorial in Google.\n%: is the probability of elements repetition\nThis software is experimental and may contain errors.\nLicense: MIT\nSource Code: https://github.com/vernetit/3dnback\nContact: robertchalean@gmail.com');">?</a>
+<a href="#" onclick="alert('Melody N-Back 6\To learn the n-back trainning please find Brain Workshop tutorial in Google.\nThis software is experimental and may contain errors.\nLicense: MIT\nSource Code: https://github.com/vernetit/ideas/blob/master/melodynback6\nrobertchalean@gmail.com');" class="hide-on-play">?</a>
 &nbsp;<div class="fb-share-button" data-href="http://competicionmental.appspot.com/melodynback" data-layout="button_count" style="float: right;"></div>
 </div>
 
@@ -379,6 +406,8 @@ function playNote(note,off,velocity=127){
 }
 
 
+loaded=0;
+
 window.onload = function () {
   MIDI.loadPlugin({
     soundfontUrl: "./soundfont/",
@@ -387,6 +416,7 @@ window.onload = function () {
       console.log(state, progress);
     },
     onsuccess: function() {
+      loaded=1;
       var delay = 0; // play one note every quarter second
       //var note = 51; // the MIDI note
       // var note = 48; // the MIDI note
@@ -666,6 +696,7 @@ arrayRitmo2D1=[];
 
 total_time=0;
 
+//este es el que se usa
 function playMelody(x,_y){
 
 
@@ -879,6 +910,19 @@ var melodyArrayTotal=[];
 
 var synth,synth1,panner,panner1,panner2;
 
+function waitThenRun(objectToWaitFor, callback) {
+    var interval = setInterval(function() {
+        if (window[objectToWaitFor] == 1) {
+            clearInterval(interval);
+            callback();
+        }
+    });            
+}
+
+
+ritmoArrayTotal=[];
+
+
 function play(_xxx){
 
   
@@ -888,9 +932,19 @@ function play(_xxx){
     //var script = document.createElement('script');
     //script.setAttribute('type', 'text/javascript');
     //script.setAttribute('src', 'js/Tone.min.js');
-    //document.head.appendChild(script);
+    //document.head.appspotendChild(script);
 
-    setTimeout(function(){ play(0); },100);
+    if(!loaded) $("#d11").html("<center>Loading...</center>");
+
+    $(".hide-on-play").hide();
+
+    waitThenRun("loaded", function() {
+      $("#d11").html("");
+      play(0);
+
+    });
+
+    //setTimeout(function(){  },100);
 
     return;
   }
@@ -899,6 +953,12 @@ function play(_xxx){
 
     if(bOnGame)
       return;
+
+    $(".hide-on-play").hide();
+
+    if(!bMobile) $("#stats-1").css("float","right");
+
+    ritmoArrayTotal=[];
 
     //create a synth and connect it to the master output (your speakers)
     //Tone.Transport.setBpm(130);
@@ -1001,14 +1061,30 @@ function play(_xxx){
     }
     console.log(melodyArrayTotal);
 
-     t_ini = Date.now();
+    ritmoArrayTotal=[];
+    
+
+    for(i=0;i<8;i++){
+
+      new_ritmo=[];
+
+      for(j=0;j<n("quantity-notes-sel");j++){
+        if(_.random(0,1)) new_ritmo[j]=1; else new_ritmo[j]=0.5;
+      }
+
+      ritmoArrayTotal[i]=_.extend(new_ritmo);
+
+    }
+
+    console.log(ritmoArrayTotal);
+
+    t_ini = Date.now();
 
      //arrayImages1=[0,1,2,3,4,5,6,7,8,9];
 
   }//end x==0
 
-   _maxCantidadNotas=n("quantity-notes-sel");
-
+  _maxCantidadNotas=n("quantity-notes-sel");
 
   bOnGame=1; 
 
@@ -1236,6 +1312,11 @@ function play(_xxx){
 
       // $("#results").html(txt);
       $("#d11").html(txt);
+
+      $(".hide-on-play").show();
+      if(bMobile) $("#scale-span").hide();
+      if(!bMobile) $("#stats-1").css("float","");
+
       //$("#canvas").html(`<div id="canvas11">Hello!<br>Here the instructions of the original nback game to guide you in locinback: <a href="http://brainworkshop.sourceforge.net/tutorial.html">http://brainworkshop.sourceforge.net/tutorial.html</a></div>`);
 
       bOnGame=0;
@@ -1417,9 +1498,9 @@ function play(_xxx){
       
       contador=0;
 
-       arrayRitmo1=[];
+       
 
-
+       /*
         for(i=0;i<_maxCantidadNotas;i++){
           if(bRitmo){
             multiplicar=1;
@@ -1434,10 +1515,8 @@ function play(_xxx){
             
 
           }
-        }
-         arrayRitmo2D1[currentPasada]=[];
-
-        arrayRitmo2D1[currentPasada]=_.extend(arrayRitmo1);
+        }*/
+         
 
 
       /*
@@ -1452,8 +1531,14 @@ function play(_xxx){
 
 
       for(;;){
+          myRnd=_.random(0,7);
+         _myImagen1=melodyArrayTotal[myRnd];
 
-         _myImagen1=melodyArrayTotal[_.random(0,7)];
+         arrayRitmo2D1[currentPasada]=[];
+
+        arrayRitmo2D1[currentPasada]=_.extend(ritmoArrayTotal[myRnd]);
+
+        arrayRitmo1=_.extend(ritmoArrayTotal[myRnd]);
 
 
           if(_.random(1,100)<=tricky && tricky!=0 && cantidadBack!=1 && currentPasada-2>=0){
@@ -1763,6 +1848,9 @@ $("#mas").click(function(){
 });
 
 $("#stop1").click(function(){
+    $(".hide-on-play").show();
+    if(!bMobile) $("#stats-1").css("float","");
+    if(bMobile) $("#scale-span").hide();
     $("#stop1").hide();
     clearTimeout(killInterval);
     clearTimeout(kill2);
@@ -1772,18 +1860,20 @@ $("#stop1").click(function(){
 });
 
 
+
 if(bMobile==1){
-
-
 
     _ww=$(window).width();
     _wh=$(window).height();
 
-    $("#logo-span").html(`<span style="font-size: 15px">Melody </span>`);
-    $("#logo-span").hide()
-    $(".back-b").hide()
+    $("#logo-span").html(``);
+    //$("#logo-span").hide()
+    $(".back-b").html("")
 
     $("#canvas").css("margin-top","10px");
+
+     $("#stats-1").css("float","right");
+   
 
     $("#controls-div").hide();
 
