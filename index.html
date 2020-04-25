@@ -1,0 +1,3124 @@
+<!-- goto important to cancel active play  -->
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>emdrMovie</title>
+
+  <script src="js/jquery.min.js"></script>
+  <script src="js/underscore-min.js"></script>
+  <script src="js/jquery.mousewheel.js"></script>
+
+  <script src="js/midi/Base64binary.js" type="text/javascript"></script> 
+  <script src="js/midi/WebAudioAPI.js" type="text/javascript"></script>
+  
+  <script src="js/midi/audioDetect.js" type="text/javascript"></script>
+  <script src="js/midi/gm.js" type="text/javascript"></script>
+  <script src="js/midi/loader.js" type="text/javascript"></script>
+  <script src="js/midi/plugin.audiotag.js" type="text/javascript"></script>
+  <script src="js/midi/plugin.webaudio.js" type="text/javascript"></script>
+  <script src="js/midi/plugin.webmidi.js" type="text/javascript"></script>
+
+  <script src="js/midi/dom_request_script.js" type="text/javascript"></script>
+
+
+  <style type="text/css">
+  body{ background-color: black; color: green; }
+
+     @keyframes example8 {
+    /*- 
+     0%   {  -webkit-filter: blur(12px);}
+     25%   {-webkit-filter: blur(8px);  }
+     50%   {-webkit-filter: blur(6px); }
+     75%   {-webkit-filter: blur(2px); }
+     100%   { -webkit-filter: blur(0px); }*/
+      }
+
+      .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #f9f9f9;
+            min-width: 160px;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            padding: 12px 16px;
+           
+        }
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+  </style>
+</head>
+<body>
+<a href="#" onclick="location.reload();" ><b>intervalMovie</b></a> 
+<span id="menu-modules"></span>
+<script type="text/javascript">
+  bAuto=0;
+  sinestesia=0;
+</script>
+<script type="text/javascript">eye=0; bPartMovie=0;</script>
+<input  type="button" value="start" onclick="sinestesia=0; start(0);" id="start-btn">
+<input  type="button" value="kill" onclick="$('#movie').html('');" id="stop-btn">
+<input  type="button" value="m part start" onclick="sinestesia=0; bPartMovie=1; start(0);" id="start-btn">
+<input  type="button" value="start s" onkeydown="return;" onclick="this.blur(); sinestesia=1; bPartMovie=0; start(0); $('#pasadas').hide();" id="start2-btn">
+<input  type="button" value="start sa" onkeydown="return;" onclick="this.blur(); sinestesia=1; bPartMovie=0; bAuto=1; start(0); $('#pasadas').hide();" id="start2-btn">
+<input  type="button" value="start ss" onkeydown="return;" onclick="this.blur(); sinestesia=2; bPartMovie=0; start(0); $('#pasadas').hide();" id="start2-btn">
+<input  type="button" value="start c" onclick="sinestesia=0; bPartMovie=0; addColor(); start(0);" id="start3-btn">
+<input  type="button" value="start e" onclick="sinestesia=0; bPartMovie=0; eye=1; start(0); $('#pasadas').hide();" id="start4-btn">
+<input  type="button" value="noflip" onclick="noflip=!noflip;" /*$('#pasadas').hide();*/" id="noflip-btn">
+<script type="text/javascript">
+  bFullScreen=1; 
+  bPiano=0;
+</script>
+<input  type="button" value="bFullScreen" onclick="bFullScreen=!bFullScreen;" id="">
+<input  type="button" value="FS" onclick="bFullScreen=!bFullScreen; if(bFullScreen){ setFS(); } " id="">
+<input  type="button" value="bPiano" onclick="bPiano=!bPiano;" id="">
+
+<!-- <input  type="button" value="play" onclick="play(2);" id="play-btn"> -->
+<!-- <input  type="button" value="stop" onclick="stopFlash();" id="stop-btn"> -->
+<span id="movies"> </span>
+<input type="number" value="2000" id="start-time" style="width: 50px;" onClick="this.select();">
+<input type="button" value="clearTxt" onclick="$('#input1').val('');" style="display:none;">
+<input type="button" value="rndTxt" onclick="getRndTxt();" id="rnd-btn" style="display:none;">
+
+<span style="display:none;">
+  <input type="button" value="+" onclick=" _v=n('vel'); _v+=1; $('#vel').val(_v); " >
+  <input type="number" value="0" id="vel" style="width:40px">
+  <input type="button" value="-" onclick=" _v=n('vel'); _v-=1; $('#vel').val(_v); " >
+</span>
+<input type="number" value="500" id="vel2" style="width:40px; display:none;">
+<select id="velocityFlash" style="width: 75px; display:none;" onchange="calcularTiempo();">   
+    <option value="50">50wpm</option>
+    <option value="75">75wpm</option>
+    <option value="100">100wpm</option>
+    <option value="125">125wpm</option> 
+    <option value="150"  selected>150wpm</option>
+    <option value="155">155wpm</option>
+    <option value="160">160wpm</option>
+    <option value="165">165wpm</option>
+    <option value="170">170wpm</option>
+    <option value="175">175wpm</option>
+    <option value="180">180wpm</option>
+    <option value="185">185wpm</option>
+    <option value="190">190wpm</option>
+    <option value="195">195wpm</option>
+    <option value="200">200wpm</option>
+     <option value="205">205wpm</option>
+    <option value="210">210wpm</option>
+    <option value="215">215wpm</option>
+    <option value="220">220wpm</option>
+    <option value="225">225wpm</option>
+     <option value="230">230wpm</option>
+    <option value="235">235wpm</option>
+    <option value="240">240wpm</option>
+    <option value="245">245wpm</option>
+    <option value="250">250wpm</option>
+    <option value="275">275wpm</option>
+    <option value="300">300wpm</option>
+    <option value="325">325wpm</option>
+    <option value="350">350wpm</option>
+    <option value="375">375wpm</option>
+    <option value="400">400wpm</option>
+    <option value="425">425wpm</option>
+    <option value="450">450wpm</option>
+    <option value="475">475wpm</option>
+    <option value="500">500wpm</option>
+    <option value="525">525wpm</option>
+    <option value="550">550wpm</option>
+    <option value="575">575wpm</option>
+    <option value="600">600wpm</option>
+    <option value="625">625wpm</option>
+    <option value="650">650wpm</option>
+    <option value="675">675wpm</option>
+    <option value="700">725wpm</option>
+    <option value="725">700wpm</option>
+    <option value="750">750wpm</option>
+    <option value="775">775wpm</option>
+    <option value="800">800wpm</option>
+    <option value="825">825wpm</option>
+    <option value="850">850wpm</option>
+    <option value="875">875wpm</option>
+    <option value="900">900wpm</option>
+    <option value="925">925wpm</option>
+    <option value="950">950wpm</option>
+    <option value="975">975wpm</option>
+    <option value="1000">1000wpm</option>
+    <option value="1100">1100wpm</option>
+    <option value="1200">1200wpm</option>
+  </select>
+<span style="display:none;">
+  <select id="vel-3">
+    <option value="0" selected>0</option>
+    <option value="1">1</option>
+    <option value="2">2</option>
+    <option value="3">3</option>
+    <option value="4">4</option>
+    <option value="5">5</option>
+  </select>
+  <select id="vel-10">
+    <option value="0" selected>0</option>
+    <option value="1">1</option>
+    <option value="2">2</option>
+    <option value="3">3</option>
+    <option value="4">4</option>
+    <option value="5">5</option>
+  </select>
+</span>
+<span style="display:none">
+<input type="button" value="+" onclick=" agregarX=50; cw+=agregarX; /*canvas.width=cw; */">
+<input type="button" value="-" onclick=" agregarX=-50; cw+=agregarX; /*canvas.width=cw;*/ " >
+<div class="dropdown">
+  <input type="button" value="colors" onclick="bColors=!bColors; espectro();">
+  <div class="dropdown-content" style="width: 70px !important;">
+  c1:  <input class="jscolor" value="ffffff" id="c-1" onchange="espectro()">
+  c2:   <input class="jscolor" value="3E296B" id="c-2"  onchange="espectro()">
+  rango: <input type="number" value="40" id="rango" style="width:45px;" onchange="espectro()">
+   
+  </div>
+</div>
+<div class="dropdown">
+  font
+  <div class="dropdown-content" style="width: 50px !important;">
+    <input type="button" value="+" onclick="font_size+=1;" >
+    <input type="button" value="-" onclick="font_size-=1;" >
+  </div>
+</div>
+<span style="color: green;" id="cv"></span>
+</span>
+ <div class="dropdown" style="display:none;">
+ subs
+  <div class="dropdown-content" style="width: 70px !important;">
+    line m0 <span id="l0"></span>
+  </div>
+ </div>
+ <div class="dropdown">
+ <input type="text" value="1" id="pRate" style="width: 25px;" onchange="newPlayVelocity();">&nbsp;
+  <div class="dropdown-content" style="width: 70px !important;">
+    <select onchange="$('#pRate').val(this.value); newPlayVelocity(this.value);" class="mySelect">
+      <option value="0.5">0.5</option>
+      <option value="0.75">0.75</option>
+      <option value="0.8">0.8</option>
+      <option value="0.85">0.85</option>
+      <option value="0.9">0.9</option>
+      <option value="0.95">0.95</option>
+      <option value="1">1</option>
+      <option value="1.05">1.05</option>
+      <option value="1.1">1.1</option>
+      <option value="1.15">1.15</option>
+      <option value="1.2">1.2</option>
+      <option value="1.25">1.25</option>
+      <option value="1.5" selected>1.5</option>
+      <option value="1.75">1.75</option>
+      <option value="2">2</option>
+      <option value="2.25">2.25</option>
+      <option value="2.5">2.5</option>
+      <option value="2.75">2.75</option>
+      <option value="3">3</option>
+      <option value="3.5">3.5</option>
+    </select>
+  </div>
+ </div>
+  <select id="intervalView" onchange="newIntervalView(this.value);">
+      <option value="500">0.5s</option>
+      <option value="750">0.75s</option>
+      <option value="1000">1s</option>
+      <option value="1500">1.5s</option>
+      <option value="2000">2s</option>
+      <option value="2500">2.5s</option>
+      <option value="3000" selected>3s</option>
+      <option value="3500">3.5s</option>
+      <option value="4000">4s</option>
+      <option value="5000">5s</option>
+      <option value="6000">6s</option>
+      <option value="7000">7s</option>
+      <option value="8000">8s</option>
+      <option value="9000">9s</option>
+      <option value="10000">10s</option>
+      <option value="11000">11s</option>
+      <option value="12000">12s</option>
+  </select>
+ 
+ <input type="button" value="+" onclick=" agregarX=50; cw+=agregarX; canvas.width=cw; ">
+<input type="button" value="-" onclick=" agregarX=-50; cw+=agregarX; canvas.width=cw; " >
+
+pasadas
+
+<select id="cantidadPasadas">
+    <option value="0" selected>0</option>
+    <option value="3">3</option>
+    <option value="5">5</option>
+    <option value="7">7</option>
+    <option value="10">10</option>
+    <option value="15">15</option>
+    <option value="27">27</option>
+    <option value="30">30</option>
+  </select>
+
+   sections
+  <select id="sectionA" style="width: 75px;" onchange="/*calcularTiempo();*/">   
+  <option value="-1" selected>random</option>
+  <option value="0">0</option>
+  <option value="1">1</option>
+  <option value="2">2</option>
+  <option value="3">3</option>
+  <option value="4">5</option>
+  <option value="10">10</option>
+</select>
+limit
+<select id="sectionB" style="width: 75px;" onchange="/*calcularTiempo();*/">   
+  <option value="0" selected>none</option>
+  <option value="4">4</option>
+  <option value="5">5</option>
+  <option value="6">6</option>
+  <option value="7">7</option>
+  <option value="8">8</option>
+  <option value="9">9</option>
+  <option value="10">10</option>
+  <option value="11">11</option>
+  <option value="12">12</option>
+  <option value="13">13</option>
+  <option value="14">14</option>
+  <option value="15">15</option>
+  <option value="20">20</option>
+</select>
+<script type="text/javascript">
+for(let x=15;x<=2000;x+=5){
+  $('#sectionA').append($('<option>', {
+    value: x,
+    text: x
+  }));
+}
+for(let x=25;x<=1000;x+=5){
+  $('#sectionB').append($('<option>', {
+    value: x,
+    text: x
+  }));
+}
+</script>
+
+delay
+
+<select id="delaySpace">
+    <option value="0">none</option>
+    <option value="10">.001s</option>
+    <option value="25">.025s</option>
+    <option value="40">.04s</option>
+    <option value="50">.05s</option>
+    <option value="100">.1s</option>
+    <option value="150">.15s</option>
+    <option value="200">.2s</option>
+    <option value="300">.3s</option>
+    <option value="400">.4s</option>
+    <option value="500">.5s</option>
+    <option value="750">.75s</option>
+    <option value="1000" selected>1s</option>
+    <option value="1500">1.5s</option>
+    <option value="2000">2s</option>
+    <option value="2500">2.5s</option>
+    <option value="3000">3s</option>
+    <option value="3500">3.5s</option>
+    <option value="4000">4s</option>
+    <option value="4500">4.5s</option>
+    <option value="5000">5s</option>
+    <option value="6000">6s</option>
+    <option value="7000">7s</option>
+    <option value="8000">8s</option>
+    <option value="9000">9s</option>
+    <option value="10000">10s</option>
+</select> 
+
+color
+<select id="color-change" onchange="/*actualizaSetAll();*/">
+    <option value="0">0s</option>
+    <option value="5">0.005s</option>
+    <option value="10">0.01s</option>
+    <option value="15">0.015s</option>
+    <option value="20">0.2s</option>
+    <option value="25">0.025s</option>
+    <option value="30">0.03s</option>
+    <option value="40">0.04s</option>
+    <option value="50">0.05s</option>
+    <option value="75">0.075s</option>
+    <option value="100">0.1s</option>
+    <option value="125">0.125s</option>
+    <option value="150">0.15s</option>
+    <option value="200">0.2s</option>
+    <option value="250">0.25s</option>
+    <option value="300">0.3s</option>
+    <option value="350">0.35s</option>
+    <option value="375">0.375s</option>  
+    <option value="400" >0.4s</option>
+    <option value="500">0.5s</option>
+    <option value="600">0.6s</option>
+    <option value="650">0.65s</option>
+    <option value="700" selected>0.7s</option>
+    <option value="800">0.8s</option>
+    <option value="900">0.9s</option>
+    <option value="1000">1s</option>
+    <option value="1100">1.1s</option>
+    <option value="1200">1.2s</option>
+    <option value="1300">1.3s</option>
+    <option value="1400">1.4s</option>
+    <option value="1500">1.5s</option>
+    <option value="2000">2s</option>
+    <option value="2500">2.5s</option>
+    <option value="3000">3s</option>
+    <option value="4000">4s</option>
+    <option value="5000">5s</option>
+  </select>
+
+<span style="/*float: left; */margin-rigth: 10px;">
+   &nbsp;
+  OK:&nbsp;<span id="ok" s>0</span>&nbsp;|
+  &nbsp;E:&nbsp;<span id="error">0</span>&nbsp;|
+  C:&nbsp;<span id="cantidad-pasadas">0</span>&nbsp;|
+  T:&nbsp;<span id="time">0</span>&nbsp;ms&nbsp;
+
+</span>
+
+<a href="#" onclick="alert('contact:robertchalean@gmail.com')" style="color:green;">[?]</a>
+<br><br><br><br><br><br><br>
+
+<div id="screen" style="border-style: solid;" onclick="">
+
+<center><div id="pasadas" style="position: fixed; background-color: black; top: 700px; left: 700px; z-index: 600; /*font-size: 30px;*/" onclick="changeIndexText(0);">0</div></center>
+<div id="checkboxSystem" style="position: fixed; background-color: black; top: 50px; left: 700px; z-index: 50;">x</div>
+<br>
+  <center>
+  <div id="movie" style="position: fixed; top: 100px; left:0px; z-index: 500;">
+    
+  </div>
+  </center>
+</div>
+<!-- <center>
+  <div id="container">
+    <canvas id="my_canvas" width="1324px" height="40px" style="z-index: 1001; background-color : transparent;"></canvas>
+  </div>
+</center>
+ -->
+<div id="color-system" style="display:none;"></div>
+<div id="protect" style="position: fixed; top: 50px; left: 1315px; z-index: 9999; width: 25px; height: 1000px; background-color: black;">&nbsp;</div>
+<div id="protect-1" style="position: fixed; top: 50px; left: 80px; z-index: 9999; width: 25px; height: 1000px; background-color: black;">&nbsp;</div>
+
+<script type="text/javascript">
+
+bPartMovie=0; //281019
+
+function n(x){ return parseFloat($("#"+x).val()); }
+
+var abc1  =  {
+
+  'a' : 'rgb(0,0,180)','A' : 'rgb(0,0,180)','á' : 'rgb(0,0,180)','Á' : 'rgb(0,0,180)','b' : 'rgb(175,13,102)','B' : 'rgb(175,13,102)','c' : 'rgb(146,248,70)','C' : 'rgb(146,248,70)','d' : 'rgb(255,200,47)','D' : 'rgb(255,200,47)','e' : 'rgb(255,118,0)','E' : 'rgb(255,118,0)','é' : 'rgb(255,118,0)','É' : 'rgb(255,118,0)','f' : 'rgb(255,152,213)','F' : 'rgb(255,152,213)','g' : 'rgb(235,235,222)','G' : 'rgb(235,235,222)','h' : 'rgb(100,100,100)','H' : 'rgb(100,100,100)','i' : 'rgb(255,255,0)','I' : 'rgb(255,255,0)','í' : 'rgb(255,255,0)','Í' : 'rgb(255,255,0)','j' : 'rgb(255,255,150)','J' : 'rgb(255,255,150)','k' : 'rgb(55,19,112) ','K' : 'rgb(55,19,112) ','l' : 'rgb(202,62,94)','L' : 'rgb(202,62,94)','m' : 'rgb(205,145,63)','M' : 'rgb(205,145,63)','n' : 'rgb(12,75,100)','N' : 'rgb(12,75,100)','ñ' : 'rgb(12,75,100)','ñ' : 'rgb(12,75,100)','o' : 'rgb(255,0,0)','O' : 'rgb(255,0,0)','ó' : 'rgb(255,0,0)','Ó' : 'rgb(255,0,0)','p' : 'rgb(175,155,50)','P' : 'rgb(175,155,50)','q' : 'rgb(185,185,185)','Q' : 'rgb(185,185,185)','r' : 'rgb(37,70,25)','R' : 'rgb(37,70,25)','s' : 'rgb(121,33,135)','S' : 'rgb(121,33,135)','t' : 'rgb(83,140,208)','T' : 'rgb(83,140,208)','u' : 'rgb(0,154,37)','U' : 'rgb(0,154,37)','ú' : 'rgb(0,154,37)','Ú' : 'rgb(0,154,37)','v' : 'rgb(178,220,205)','V' : 'rgb(178,220,205)','w' : 'rgb(169,34,0)','W' : 'rgb(169,34,0)','x' : 'rgb(0,0,74)','X' : 'rgb(0,0,74)','y' : 'rgb(175,200,74)','Y' : 'rgb(175,200,74)','z' : 'rgb(63,25,12)','Z' : 'rgb(63,25,12)','0' : 'rgb(0,0,180)','0' : 'rgb(0,0,180)','1' : 'rgb(175,13,102)','1' : 'rgb(175,13,102)','2' : 'rgb(146,248,70)','2' : 'rgb(146,248,70)','3' : 'rgb(255,200,47)','3' : 'rgb(255,200,47)','4' : 'rgb(255,118,0)','4' : 'rgb(255,118,0)','5' : 'rgb(255,152,213)','5' : 'rgb(255,152,213)','6' : 'rgb(235,235,222)','6' : 'rgb(235,235,222)','7' : 'rgb(100,100,100)','7' : 'rgb(100,100,100)','8' : 'rgb(255,255,0)','8' : 'rgb(255,255,0)','9' : 'rgb(255,255,150)','9' : 'rgb(255,255,150)'
+
+  };
+
+_color = "abcdefghijklmnopqrstuvwxyz";
+_color333 = "abcdefghijklmnñopqrstuvwxyz";
+
+poner="";
+
+for(i=0;i<_color.length;i++){
+  r=abc1[_color.charAt(i)].split("rgb(").join(""); r=r.split(")").join(""); r=(parseInt(r.split(",")[0])/255).toFixed(2);
+  g=abc1[_color.charAt(i)].split("rgb(").join(""); g=g.split(")").join(""); g=(parseInt(g.split(",")[1])/255).toFixed(2);
+  b=abc1[_color.charAt(i)].split("rgb(").join(""); b=b.split(")").join(""); b=(parseInt(b.split(",")[2])/255).toFixed(2);
+
+  //console.log(r+","+g+","+b);
+
+
+  poner+=`
+  <style>
+      .profile-pic-${_color.charAt(i)} {
+        /*
+      width: 100%;
+      height: auto;
+      border-radius: 50%;
+      box-shadow: #222 0.2em 0.2em 1em;*/
+   
+      -webkit-filter: url(#duotone-${_color.charAt(i)});
+      filter:  url(#duotone-${_color.charAt(i)});
+      box-shadow: #224 0.2em 0.2em 0.6em 0.1em;
+    }
+    </style>
+
+    <svg class="defs-only">
+      <filter id="duotone-${_color.charAt(i)}" color-interpolation-filters="sRGB"
+              x="0" y="0" height="100%" width="100%">
+        <feColorMatrix type="matrix"
+          values="${r} 0 0 0  0.0
+                  ${g} 0 0 0  0.0  
+                  ${b} 0 0 0  0.0 
+                    0  0 0 1  0" />
+      </filter>
+    </svg>
+
+  `;
+
+}
+
+//console.log(poner)
+$("#color-system").html(poner);
+
+
+
+currentClass="";
+prevClass=-1;
+indexClass=0;
+
+//class="profile-pic-${_palabra1.charAt(myI)}"
+
+function addColor(){
+
+  var vel=n("color-change");
+
+  if(vel==0)  $("#m0").removeClass(prevClass);
+
+  if(/*bLoaded &&*/ $("#m0").is(":visible") && vel!=0){
+
+    //console.log("col")
+
+
+     $("#m0").removeClass(prevClass);
+
+    indexClass=_.random(0,_color.length-1);
+
+    letter=_color.charAt(indexClass);
+
+    currentClass="profile-pic-"+letter;
+
+    prevClass=currentClass;
+
+    $("#m0").addClass(currentClass);
+
+    indexClass++;
+
+    if(indexClass==_color.length) indexClass=0;
+
+
+
+
+  }else{
+    vel=30;
+  }
+
+ 
+  setTimeout(function(){ addColor(); }, vel  );
+
+
+}
+
+
+
+
+
+/*
+$("#screen").click(function(e){
+  console.log(e)
+
+  //var offset = $(this).offset();
+   
+
+    var relativeX = (e.pageX);
+  var relativeY = (e.pageY);
+
+  console.log(relativeX+ " " + relativeY);
+  
+
+});*/
+
+bChangeIndexText=0;
+
+function changeIndexText(x){
+
+  //return;
+
+  if(x==0){ bChangeIndexText=!bChangeIndexText; } 
+
+  if(bChangeIndexText){
+
+    for(let i=0;i<n("sectionB");i++){
+
+      $("#txt-"+i).html(i);
+      $("#txt-"+i).html(allArray[i]);
+    }
+
+  }else{
+
+     for(let i=0;i<n("sectionB");i++){
+
+      $("#txt-"+i).html(arrayIntervalViewSelected[i]);
+    }
+  }
+
+  console.log(bChangeIndexText);
+}
+
+
+posArray=[];
+indexArray=0;
+
+$(document).click(function(event) {
+
+     
+    var relativeX = event.pageX;
+    var relativeY = event.pageY;
+
+    if(eye==1 || bPartMovie){
+
+      if(relativeY<=40) return;
+
+
+      posArray[indexArray]=[relativeX,relativeY];
+      indexArray++;
+
+      if(indexArray==2) indexArray=0; 
+
+      return;
+    }
+
+
+    if(relativeY<=40) return;
+
+    $("#pasadas").css("top",relativeY+"px");
+  $("#pasadas").css("left",relativeX+"px");
+
+});
+
+bMostrarPasadas=1;
+
+$(document).contextmenu(function(event) {
+
+    var relativeX = event.pageX;
+    var relativeY = event.pageY;
+
+    if(relativeY<=50) return;
+
+    bMostrarPasadas=!bMostrarPasadas;
+
+    if(bMostrarPasadas) $("#pasadas").show(); else $("#pasadas").hide();
+
+});
+
+bMostrarCheckboxSystem=1;
+
+$(document).mousewheel(function(event) {
+    //console.log(event.deltaX, event.deltaY, event.deltaFactor, event.pageY);
+
+    if(event.pageY<=50) return;
+
+    bMostrarCheckboxSystem=!bMostrarCheckboxSystem;
+
+    if(bMostrarCheckboxSystem) $("#checkboxSystem").show(); else $("#checkboxSystem").hide();
+});
+
+cantidadPasadas=0;
+
+agregarX=0;
+
+require('./renderer.js')
+const fs= require("fs");
+
+fd="";
+var arrayDirs=[];
+allMovs=[];
+
+fs.readdir('movies/', (err, dir) => {
+   sel=`<select id="img-select" onchange="/*openFiles(this.value);*/" style="width:150px;">
+    <option value="-1">---</option>
+
+   `;
+   bFirstDir=0;
+   fd="";
+   arrayDirs=[]; z=0;
+    for (var i = 0, path; path = dir[i]; i++) {
+
+     
+
+      //console.log(""+path.indexOf("."));
+      if(path.indexOf(".")!=0){
+        if(!bFirstDir){
+          bFirstDir=1;
+          fd=path;
+
+        }
+        if(path.indexOf(".mp4")==-1) continue;
+        allMovs[z]=`movies/${path}`;
+        sel+=`<option value="movies/${path}">`+(path)+`</option>`;
+        arrayDirs[z]=path; z++;
+      }
+    }
+    sel +="</select>";
+    fd=arrayDirs[0];
+
+    $("#movies").html(sel);
+
+
+    $("#img-select").val(allMovs[_.random(0,allMovs.length-1)]);
+   
+
+    //debug
+
+    //$("#img-select").prop('selectedIndex', 1);
+   
+  
+});
+
+// var rainbow = new Rainbow();
+// rainbow.setSpectrum('#ffffff', '#3E296B');
+// rainbow.setNumberRange(1, 20); 
+// console.log(rainbow.colourAt(1)); 
+
+function createLineSubitlesConfiguration(x){
+  sel=`<select id="l-${x}" style="width:100px;">
+    <option value="-1">no</option>
+   `;
+
+   for(i=1;i<=30;i++){
+    sel+=`<option value="${i}">${i}</option>`;
+   }
+   sel+=`</select>`
+
+   $("#l"+x).html(sel);
+
+
+
+}
+
+//$('#l-0').val(20); 
+//debug
+
+createLineSubitlesConfiguration(0);
+
+var rainbow;
+var _rango=40;
+
+font_size=38;
+var velocity2=0;
+
+function espectro(){
+  _rango=n("rango");
+  //console.log("espectro")
+  rainbow = new Rainbow();
+  rainbow.setSpectrum('#'+$('#c-1').val(), '#'+$('#c-2').val() );
+  rainbow.setNumberRange(1, _rango); 
+} 
+
+// function n(x){ return parseInt($("#"+x).val()); }
+
+  
+// var canvas = document.getElementById("my_canvas")
+// var c = canvas.getContext("2d")
+
+// cw=canvas.width;
+// ch=canvas.height;
+
+agregarX=0;
+
+var kill,kill
+bColors=0;
+bOk=0;
+Ok=0;
+_wpm=0;
+
+
+var bStart=0, cadena, posicion, cantidad, indexColors=0;
+
+function subName(x){
+
+  a=x.replace(".mp4","");
+  return a+".vtt";
+
+
+}
+
+bFirst=0;
+
+var killM;
+var x3=1,x4=1;
+
+function mover(){
+
+  return;
+
+
+  for(;;){
+
+    x1=_.random(30,800);
+    x2=_.random(30,600);
+
+    d=Math.sqrt( Math.pow( x3 - x1, 2) + Math.pow( x4 - x2, 2) ) ;
+
+    if(d >= 175/* && d<=300*/ )  break;
+
+
+  }
+
+
+
+  x3=x1;
+  x4=x2;
+
+  $("#movie").css("left",x1+"px")
+  $("#movie").css("top",x2+"px")
+
+
+  /*
+  bZ=!bZ;
+
+  if(bZ){
+
+    $(".anim").css("zoom","0.75")
+  }else{
+    $(".anim").css("zoom","1.75")
+
+  }*/
+
+  $(".anim").css("animation-duration",n("vel2")/1000+"s")
+
+
+
+  killM=setTimeout(function(){ mover(); },n("vel2"));
+}
+
+bZ=0;
+
+var killIntervalView;
+bLoaded=0;
+ant_pasada=-1;
+
+pasadasOld=-1;
+
+bChangePasadas=1;
+
+function intervalCheck(){
+
+  sectionA=n("sectionA")
+  sectionB=n("sectionB")
+
+  if(bLoaded){
+
+    if($("#m0").get(0).currentTime>=arrayIntervalView[pasadas+1]-0.5){
+
+      //$("#screen").css("border-color","green");
+    }
+
+    if($("#m0").get(0).currentTime>=arrayIntervalView[pasadas+1]){
+
+        changeIndexText(1);
+
+      
+        if(sectionB==0){
+
+          if(bChangePasadas){ pasadasOld=pasadas; bChangePasadas=0; } 
+
+          cantidadPasadas++; $("#pasadas").html(cantidadPasadas);
+
+          if(n("cantidadPasadas")!=0){
+
+            if(cantidadPasadas%n("cantidadPasadas")==0 && n("cantidadPasadas")!=0 ){ pasadas++;  cantidadPasadas=0; } 
+
+          }
+
+           if(n("delaySpace")!=0){
+             $("#pasadas").html( pasadasOld);
+             $("#m0").get(0).pause();
+             $("#pasadas").show();
+             $("#m0").hide();
+             setTimeout(function(){  $("#pasadas").hide(); bChangePasadas=1; $("#m0").get(0).play(); $("#m0").show(); },n("delaySpace"))
+          }
+          
+          $("#m0").get(0).currentTime=arrayIntervalView[pasadas];
+          
+
+          
+
+        }else{
+
+           if(bChangePasadas){ pasadasOld=pasadas; bChangePasadas=0; }
+
+          
+          cantidadPasadas++;   
+
+          if( (cantidadPasadas%n("cantidadPasadas")==0 && n("cantidadPasadas")!=0) || n("cantidadPasadas")==0 ){ 
+
+              _x=0;
+              for(;;){
+                // _r66=_.random(sectionA,sectionA+sectionB); 
+                _r66=arrayIntervalViewSelected[_.random(0,arrayIntervalViewSelected.length-1)]
+                if(ant_pasada!=_r66 && $("#ch-"+_r66).is(':checked') )  break;
+                _x++; if(_x==1000) break;
+              }
+
+              
+
+              pasadas=_r66;
+              ant_pasada=_r66;
+              
+              cantidadPasadas=0; 
+
+              mostrarPasadas=pasadas;
+
+              if(bChangeIndexText){
+
+                for(i=0;i<arrayIntervalViewSelected.length;i++){
+                  if(pasadas==arrayIntervalViewSelected[i]){ mostrarPasadas=i; mostrarPasadas=allArray[i]; } 
+                  if(pasadasOld==arrayIntervalViewSelected[i]){ pasadasOld=i; pasadasOld=allArray[i]; } 
+
+                }
+
+              }
+
+
+
+          }
+
+          mostrarCantidadPasadas=cantidadPasadas;
+          if(cantidadPasadas==0) mostrarCantidadPasadas=""
+
+          
+
+
+           if(n("delaySpace")!=0){
+             $("#pasadas").html( pasadasOld+" "+mostrarCantidadPasadas);
+             $("#m0").get(0).pause();
+             $("#pasadas").show();
+             $("#m0").hide();
+             setTimeout(function(){  $("#pasadas").hide(); bChangePasadas=1; $("#m0").get(0).play(); $("#m0").show(); },n("delaySpace"))
+          }else{
+
+            $("#pasadas").html( mostrarPasadas+" "+mostrarCantidadPasadas); 
+
+          }
+
+          $("#m0").get(0).currentTime=arrayIntervalView[pasadas];
+
+          
+
+        }//sectionB==0
+        
+      //$("#screen").css("border-color","black");
+    }//>=pasadas+1
+  }//bLoaded
+
+  setTimeout(function(){  intervalCheck(); },50);
+
+}
+
+intervalCheck();
+$("#screen").css("border-color","black");
+
+
+arrayIntervalView=[];
+intervalViewValue=0;
+pasadas=0;
+var total_time;
+
+
+tiempoLoco=0;
+function start(x){
+
+  if(x==0){
+    bStart=!bStart
+
+    if(!bStart){
+
+      $("#start-btn").val("start")
+
+
+      clearTimeout(kill1); clearTimeout(kill2); // c.fillStyle = "black"; c.fillRect(0,0,cw,40);
+
+      return;
+    }
+
+    velocity2=n("vel2")
+
+    $("#start-btn").val("stop")
+
+    bFirst=0;
+
+    // var limpia = "";
+    // resultados = "";
+    // cantidadPalabras = 0;
+
+    // str = $("#input1").val();
+
+    // limpia = str.split("\n").join(" ");
+    // limpia = limpia.split("\t").join(" ");
+    // limpia = limpia.split("\r").join(" ");
+    // limpia = limpia.split(",").join(" ");
+    // limpia = limpia.split(".").join(" ");
+    // limpia = limpia.split(")").join(" ");
+    // limpia = limpia.split("(").join(" ");
+    // limpia = limpia.split(";").join(" ");
+    // limpia = limpia.split("-").join(" ");
+
+    // limpia = limpia.split("   ").join(" ");
+    // limpia = limpia.split("  ").join(" ");
+
+    // str = limpia;
+
+    // cadena=str.split(" ");
+    // cadena.unshift(" ");
+    // cantidad=cadena.length;
+    // posicion = 0;
+
+    pRate=parseFloat($("#pRate").val());
+
+    clearTimeout(kill2);
+
+    myMovie=$("#img-select").val();
+
+     if(myMovie!="-1"){
+      // moviesActive.push(0);
+
+      tam_x=640;
+      tam_y=480;
+
+      tam_x=640*0.6;
+      tam_y=480*0.6;
+
+
+      tam_x=1024*1.2;
+     tam_y=860*(1.2);
+
+
+      sub=subName(myMovie);
+      $("#movie").html(`
+           <div class="anim" style="animation-name: example8; animation-iteration-count: infinite; /*-webkit-filter: blur(10px);*/">
+   
+            <video  width="${tam_x}" height="${tam_y}" id="m0" <!--autoplay-->>
+              <source src="${myMovie}" type="video/mp4">
+              <!-- <track src="${sub}" kind="subtitle" srclang="en-US" label="English" /> -->
+             <!-- <track label="Spanish" kind="subtitles" srclang="en" src="${sub}" id="c0" default> -->
+            </video>
+
+            </div>
+          `);
+
+      }
+
+
+    if(bFullScreen) setFS();
+     
+
+     
+
+      $("#m0").get(0).oncanplay = function(){        
+
+        if(bFirst==1) return;
+
+        if(myMovie!="-1") $("#m0").get(0).playbackRate = pRate;
+      
+
+        //     $('video').videoSub({
+        //   containerClass:     'videosub-container',
+        //   barClass:           'videosub-bar',
+        //   useBarDefaultStyle: false
+        // });
+
+        bFirst=1;
+
+        //console.log("hola")
+
+        
+
+        if(myMovie!="-1") total_time=$("#m0").get(0).duration;
+
+        bLoaded=1;
+
+        intervalViewValue=n("intervalView")/1000;
+        countIntervalView=parseInt(total_time/intervalViewValue)
+        arrayIntervalView=[];
+        count=0;
+        console.log(countIntervalView)
+        pasadas=0;
+
+        if(n("sectionB")>0) $("#start-time").val("5");
+
+        for(var i=0;i<countIntervalView;i++){
+
+          arrayIntervalView[i]=count;
+          count+=intervalViewValue;
+
+          if(count<=n("start-time")){
+            pasadas=i;
+          }
+        }
+
+        p=-1;
+        $("#m0").css("transform", "scaleY("+p+"1)");
+
+         setInterval(function(){
+          //$("#m0").get(0).pause();
+
+          if(/*_.random(0,1)*/1){
+            myRateOld=1;
+            myRate=2;
+
+            $("#m0").get(0).playbackRate = myRate;
+
+
+            tiempoLoco=$("#m0").get(0).currentTime;
+            var acum=0;
+            var valor=600;
+            var suma_acum=valor/myRate;
+
+            $("#m0").get(0).volume=0;
+
+            for(var i=0;i<6;i++){
+              setTimeout(function(x,y){ 
+
+                console.log(i)
+                if(y==5){
+                  $("#m0").get(0).volume=1;
+                  $("#m0").get(0).playbackRate = myRateOld;
+
+
+                } 
+                else
+                {
+                  $("#m0").get(0).currentTime=tiempoLoco-(valor/1000); 
+                }
+                  
+                
+              },acum,valor,i);
+
+              acum+=suma_acum;
+
+            }
+
+
+          }else{
+             var valor=250;
+             myRateOld=2;
+             myRate=0.2
+
+            $("#m0").get(0).playbackRate = myRate;
+            tiempoLoco=$("#m0").get(0).currentTime;    
+            $("#m0").get(0).currentTime=tiempoLoco-(valor/1000);    
+            
+            $("#m0").get(0).volume=0;
+            
+
+            setTimeout(function(x){ 
+
+               myRate=1
+
+              $("#m0").get(0).volume=1;
+              $("#m0").get(0).playbackRate = myRateOld;   
+                
+            },valor/myRate);
+          }   
+                    
+        },4000);
+
+        poner="";
+        empieza=n("sectionA");
+
+        arrayIntervalViewSelected=_.range(empieza,empieza+n("sectionB"))
+        if(n("sectionA")==-1){
+
+          for(i=0;i<n("sectionB");i++){
+
+            arrayIntervalViewSelected[i]=_.random(0,countIntervalView-100);
+          }
+        }
+
+        if(n("sectionB")!=0){
+           for(i=0;i<n("sectionB");i++){
+
+              poner+=`<input type="checkbox" id="ch-${arrayIntervalViewSelected[i]}" class="myCheck" checked>&nbsp;<b><span id="txt-${i}" class="myText">${arrayIntervalViewSelected[i]}</span></b>&nbsp;`
+              
+            }
+
+            $("#checkboxSystem").html(poner)
+
+            changeIndexText(1);
+
+
+        }else{
+
+          $("#checkboxSystem").html("");
+
+        }
+
+        $("#movie").css("left","100px")
+
+        //console.log(total_time)
+
+        if(myMovie!="-1") $("#m0").get(0).currentTime=n("start-time");
+
+        clearTimeout(killM);
+
+        mover();
+
+        init(0);
+      };
+
+  }
+
+
+  // if(posicion>=cantidad){
+
+  //   return;
+  // }
+
+  // t_ini = Date.now();
+
+  // init(0);
+  //init1(0);
+  //setTimout(function(){ init1(0) } );
+
+  //setTimeout(function(){start(1)},n("vel"))
+}
+
+cw=1300;
+
+var x1,currenWord,plus,multiplo=1;
+allArray=_.range(0,99);
+var myRate, myRateOld;
+
+function init(x){
+
+  if(x==0){
+
+    allArray=_.shuffle(allArray);
+
+    x1=cw-100;
+    $("#m0").get(0).play();
+    // currenWord=cadena[posicion];
+    // tam=currenWord.length;
+    // plus=0;
+    // if(tam<=3) plus=+n("vel-3")
+    // if(tam>=10) plus=-n("vel-3")
+    // multiplo=1;
+
+
+    //Important
+    if(sinestesia==1){ play(); bLoaded=0; } 
+    if(sinestesia==2){  bLoaded=0; } 
+    if(eye){ startRandomObjetive(); }
+
+    
+
+  }
+
+   _l=parseInt($("#l-0").val());
+
+      if(_l!=-1){
+         track = document.getElementById('c0').track;
+         for(j=0;j<track.cues.length;j++){ track.cues[j].line=_l; }
+      }
+  
+
+  //console.log(currenWord)
+  //console.log(x1)
+
+  // c.fillStyle = "black"; c.fillRect(0,0,cw,40);
+  
+  // c.font= font_size + "px Georgia";
+
+  // if(bColors){
+
+  //   // if(indexColors>=colors.length) indexColors=0;
+  //   // _c=colors[indexColors]; indexColors++;
+
+    
+  //   //console.log(rainbow.colourAt(1));
+    
+  //   _t=cw/_rango;
+  //   _t1=cw%_rango;
+
+  //   myPos=0;
+  //   for(__i=0;__i<_rango;__i++){
+
+  //     if(x1>=__i*_t && x1<=(__i*_t)+_t ) break;
+  //   }
+
+  //   //console.log(__i)
+
+  //   _c="#"+rainbow.colourAt(__i+1);
+
+  //   c.fillStyle = _c;
+
+  // }else{
+
+
+  //   c.fillStyle = "green";
+
+  // }
+  
+  // c.fillText(currenWord,x1,30);
+
+  plus=0;
+  x1-=((n("vel")+plus)*multiplo)
+
+  if(x1<=0){ 
+
+    // t_fin = Date.now();
+    // t_dif = t_fin - t_ini;
+    // wpm = Math.round(60000/t_dif);
+    multiplo=-1;
+
+    //console.log(t_dif)
+
+    /*calcularTiempo();*/
+
+    ///*posicion++;*/ /*start(1);*/ return; 
+
+  }
+  if(x1>=cw-100){
+
+    multiplo=1;
+
+  }
+
+  //$("#movie").css("left",x1+"px")
+
+
+
+
+  kill1=setTimeout(function(){init(1);},1)
+}
+
+var kill2;
+
+function init1(x){
+
+  if(x==0){
+
+  }
+
+  if(!bStart) return;
+
+  //posicion++;
+  //currenWord=cadena[posicion];
+  //calcularTiempo()
+
+
+
+  if(posicion>=cantidad){
+
+    return;
+  }
+
+  //_wpm=n("velocityFlash");
+
+  killI2=setTimeout(function(){ init1(1) },  ( 60000/ n("velocityFlash") ) * 1   );
+
+
+   kill2=setTimeout(function(){init1(1);},1)
+}
+
+function calcularTiempo(){
+  
+  tiempo = ( cantidad - posicion ) * ( 60000/ n("velocityFlash") );
+
+  poner = `${posicion+1}/${cantidad} - ${getDuration(tiempo)} <!--${wpm}wpm-->`;
+
+  $("#cv").html(poner);
+
+}
+
+var t_ini;
+var t_fin;
+var t_dif;
+var wpm;
+
+var getDuration = function(millis){
+  var dur = {};
+  var units = [
+      {label:"millis",    mod:1000},
+      {label:"seconds",   mod:60},
+      {label:"minutes",   mod:60},
+      {label:"hours",     mod:24},
+      {label:"days",      mod:31}
+  ];
+  // calculate the individual unit values...
+  units.forEach(function(u){
+      millis = (millis - (dur[u.label] = (millis % u.mod))) / u.mod;
+  });
+  // convert object to a string representation...
+  var nonZero = function(u){ return dur[u.label]; };
+  dur.toString = function(){
+      return units
+          .reverse()
+          .filter(nonZero)
+          .map(function(u){
+              return dur[u.label] + " " + (dur[u.label]==1?u.label.slice(0,-1):u.label);
+          })
+          .join(', ');
+  };
+
+  /*
+  console.log(dur);
+  x = dur.split(",");
+  poner = "";
+  for(i=0;i<x.length;i++){
+    if(x[i].indexOf("millis")!=1){
+      continue;
+    }
+    poner += x[i];
+
+  }*/
+
+  //return dur;
+  return dur.hours+":"+dur.minutes+":"+dur.seconds;//+":"+dur.millis;
+};
+
+var contadorRnd;
+function getRndTxt(){
+    contadorRnd++;
+    if(contadorRnd>=5)
+      return;
+
+    $.ajax({url: "http://leerencolores.appspot.com/multiReader2?rnd=1&libro=aleatory&cPage=aleatory", success: function(result){
+        $("#input1").val(result);
+       // mode=1; bPrev=0; bNext=0;  play();
+       
+    }});
+}
+
+var abc1  =  {
+
+  'a' : 'rgb(0,0,180)','A' : 'rgb(0,0,180)','á' : 'rgb(0,0,180)','Á' : 'rgb(0,0,180)','b' : 'rgb(175,13,102)','B' : 'rgb(175,13,102)','c' : 'rgb(146,248,70)','C' : 'rgb(146,248,70)','d' : 'rgb(255,200,47)','D' : 'rgb(255,200,47)','e' : 'rgb(255,118,0)','E' : 'rgb(255,118,0)','é' : 'rgb(255,118,0)','É' : 'rgb(255,118,0)','f' : 'rgb(255,152,213)','F' : 'rgb(255,152,213)','g' : 'rgb(235,235,222)','G' : 'rgb(235,235,222)','h' : 'rgb(100,100,100)','H' : 'rgb(100,100,100)','i' : 'rgb(255,255,0)','I' : 'rgb(255,255,0)','í' : 'rgb(255,255,0)','Í' : 'rgb(255,255,0)','j' : 'rgb(255,255,150)','J' : 'rgb(255,255,150)','k' : 'rgb(55,19,112) ','K' : 'rgb(55,19,112) ','l' : 'rgb(202,62,94)','L' : 'rgb(202,62,94)','m' : 'rgb(205,145,63)','M' : 'rgb(205,145,63)','n' : 'rgb(12,75,100)','N' : 'rgb(12,75,100)','ñ' : 'rgb(12,75,100)','ñ' : 'rgb(12,75,100)','o' : 'rgb(255,0,0)','O' : 'rgb(255,0,0)','ó' : 'rgb(255,0,0)','Ó' : 'rgb(255,0,0)','p' : 'rgb(175,155,50)','P' : 'rgb(175,155,50)','q' : 'rgb(185,185,185)','Q' : 'rgb(185,185,185)','r' : 'rgb(37,70,25)','R' : 'rgb(37,70,25)','s' : 'rgb(121,33,135)','S' : 'rgb(121,33,135)','t' : 'rgb(83,140,208)','T' : 'rgb(83,140,208)','u' : 'rgb(0,154,37)','U' : 'rgb(0,154,37)','ú' : 'rgb(0,154,37)','Ú' : 'rgb(0,154,37)','v' : 'rgb(178,220,205)','V' : 'rgb(178,220,205)','w' : 'rgb(169,34,0)','W' : 'rgb(169,34,0)','x' : 'rgb(0,0,74)','X' : 'rgb(0,0,74)','y' : 'rgb(175,200,74)','Y' : 'rgb(175,200,74)','z' : 'rgb(63,25,12)','Z' : 'rgb(63,25,12)','0' : 'rgb(0,0,180)','0' : 'rgb(0,0,180)','1' : 'rgb(175,13,102)','1' : 'rgb(175,13,102)','2' : 'rgb(146,248,70)','2' : 'rgb(146,248,70)','3' : 'rgb(255,200,47)','3' : 'rgb(255,200,47)','4' : 'rgb(255,118,0)','4' : 'rgb(255,118,0)','5' : 'rgb(255,152,213)','5' : 'rgb(255,152,213)','6' : 'rgb(235,235,222)','6' : 'rgb(235,235,222)','7' : 'rgb(100,100,100)','7' : 'rgb(100,100,100)','8' : 'rgb(255,255,0)','8' : 'rgb(255,255,0)','9' : 'rgb(255,255,150)','9' : 'rgb(255,255,150)'   
+    
+};
+
+colors=[];
+
+_.each(abc1, function(x){ colors.push(x); } );
+colors=_.uniq(colors);
+
+//start(0)
+myZ=1;
+myZZ=1;
+myZZZ=1;
+
+myCurrentTime=0;
+noChange=0;
+
+setInterval(function(){
+
+  return;
+
+  //if(_.random(0,1)) x=myZ+""; else x=myZ+"";
+  //if(_.random(0,1)) x=myZ+""; else 
+  if(myZZZ==1) myZZZ = 0; else myZZZ=1;
+  
+     // if(myZZZ){
+
+     //   if(myZ==1) myZ = -1; else myZ=1;
+     //   x=myZ+"";
+
+     //   $("#m0").css("transform", "scaleX("+x+")")
+
+     // }else{
+      if(myZZ==1) myZZ = -1; else myZZ=1;
+      x=myZZ+"";
+
+    //$("#m0").css("transform", "scaleY("+x+")")
+
+    // }
+
+   // if(_.random(1,100)<20 && noChange==0 && myMovie!=-1){
+    
+   //  noChange=1;
+   //  myCurrentTime=$("#m0").get(0).currentTime;
+   //  $("#m0").get(0).currentTime=myCurrentTime-_.random(1,4);
+   //  setTimeout(function() { noChange=0; $("#m0").get(0).currentTime=myCurrentTime; },100)
+
+   // }
+   //filter: grayscale(00%);
+
+   // if(_.random(0,1)){ $("#m0").css("filter", " grayscale(0%)"); }else{ $("#m0").css("filter", " grayscale(100%)"); }
+  
+},/*_.random(1,100)*/3000)
+
+$(document).keydown(function(e) {
+  //prevDir=direccion;
+
+  console.log(e.which);
+
+  //if(e.which==32){  e.preventDefault(); return; }
+  
+  if(!bLoaded) return;
+
+    switch(e.which) {
+
+         case 67: // c
+
+
+
+         break;
+
+          case 86: // v
+
+
+
+         break;
+
+          case 66: // b
+
+
+
+         break;
+
+          case 88: // n
+
+
+
+         break;
+
+        case 37: // left
+
+          if(pasadas<1) return;
+
+          cantidadPasadas=0;
+          
+          pasadas--;
+          $("#m0").get(0).currentTime=arrayIntervalView[pasadas];
+
+         
+          
+        break;
+
+         case 65: // left
+
+         return;
+         if(pasadas<1) return;
+         cantidadPasadas=0;
+          pasadas--;
+          $("#m0").get(0).currentTime=arrayIntervalView[pasadas];
+
+          
+        break;
+
+        case 38: // up
+
+          cantidadPasadas=0;
+       
+          pasadas=_.random(0,arrayIntervalView.length-1);
+          $("#m0").get(0).currentTime=arrayIntervalView[pasadas];
+        break;
+
+        case 87: // up
+
+        return;
+
+        cantidadPasadas=0;
+        pasadas=_.random(0,arrayIntervalView.length-1);
+        $("#m0").get(0).currentTime=arrayIntervalView[pasadas];
+         
+        break;
+
+        case 39: // right
+         pasadas++;
+         cantidadPasadas=0;
+         $("#m0").get(0).currentTime=arrayIntervalView[pasadas];
+          
+        break;
+
+        case 68: // right
+          return;
+          cantidadPasadas=0;
+           pasadas++;
+           $("#m0").get(0).currentTime=arrayIntervalView[pasadas];
+        break;
+
+        case 40: // down
+         
+          // $(".myTxt").show();
+
+          bLoaded=!bLoaded;
+          
+        break;
+
+        case 53: // down
+
+        return;
+
+
+
+        bLoaded=!bLoaded;
+       
+          
+        break;
+
+        default: return; // exit this handler for other keys
+
+
+    }
+
+    e.preventDefault(); // prevent the default action (scroll / move caret)
+});
+
+function newPlayVelocity(x){
+
+  try{ $("#m0").get(0).playbackRate = parseFloat(x); }catch(err){}
+  
+}
+
+
+
+function newIntervalView(x){
+
+  
+  if(!bLoaded) return;
+
+ 
+ bLoaded=0;
+
+
+    intervalViewValue=x/1000;
+    //countIntervalView=parseInt(total_time/intervalViewValue)
+    arrayIntervalView=[];
+    count=0;
+    //console.log(countIntervalView)
+    pasadas=0;
+    for(var i=0;i<countIntervalView;i++){
+
+      arrayIntervalView[i]=count;
+      count+=intervalViewValue;
+
+      if(count<=n("start-time")){
+        pasadas=i;
+      }
+    }
+
+    bLoaded=1;
+
+   console.log("new Interval")
+
+
+
+}
+
+
+
+letra="";
+
+tricky=-1;
+
+bMover=0;
+bBasicEmo=0;
+
+var alfabeto, i, xx;
+
+modo = 1;
+alfabeto = [];
+keyCodeMinuscula = 97;
+keyCodeMayuscula = 65;
+aceleration=0;
+increment=0;
+
+for (xx = 0; xx <= 35; xx++) {
+  alfabeto[xx] = [];
+  if(xx==26){
+    keyCodeMayuscula=96;
+    keyCodeMinuscula=48;
+
+  }
+  alfabeto[xx][2] = keyCodeMayuscula; 
+  alfabeto[xx][3] = keyCodeMinuscula;
+  keyCodeMinuscula++;
+  keyCodeMayuscula++;
+  alfabeto[xx][4] = 0;
+  alfabeto[xx][5] = 0;
+  alfabeto[xx][6] = 0;
+  alfabeto[xx][7] = 1; //act
+  alfabeto[xx][8] = 1; //default
+  alfabeto[xx][9] = 0; //max
+  alfabeto[xx][10] = 10000; // min
+  alfabeto[xx][20] = xx; // number
+
+
+}
+
+alfabeto[0][0] = "A";
+alfabeto[0][1] = "rgb(0,0,180)";
+alfabeto[0][2] = 65;
+
+alfabeto[1][0] = "B";
+alfabeto[1][1] = "rgb(175,13,102)";
+alfabeto[1][2] = 66;
+
+alfabeto[2][0] = "C";
+alfabeto[2][1] = "rgb(146,248,70)";
+alfabeto[2][2] = 67;
+
+alfabeto[3][0] = "D";
+alfabeto[3][1] = "rgb(255,200,47)";
+alfabeto[3][2] = 68;
+
+alfabeto[4][0] = "E";
+alfabeto[4][1] = "rgb(255,118,0)";
+alfabeto[4][2] = 69;
+
+alfabeto[5][0] = "F";
+alfabeto[5][1] = "rgb(255,152,213)";
+alfabeto[5][2] = 70;
+
+alfabeto[6][0] = "G";
+alfabeto[6][1] = "rgb(235,235,222)";
+alfabeto[6][2] = 71;
+
+alfabeto[7][0] = "H";
+alfabeto[7][1] = "rgb(100,100,100)";
+alfabeto[7][2] = 72;
+
+alfabeto[8][0] = "I";
+alfabeto[8][1] = "rgb(255,255,0)";
+alfabeto[8][2] = 73;
+
+alfabeto[9][0] = "J";
+alfabeto[9][1] = "rgb(255,255,150)";
+alfabeto[9][2] = 74;
+
+alfabeto[10][0] = "K";
+alfabeto[10][1] = "rgb(55,19,112)";
+alfabeto[10][2] = 75;
+
+alfabeto[11][0] = "L";
+alfabeto[11][1] = "rgb(202,62,94)";
+alfabeto[11][2] = 76;
+
+alfabeto[12][0] = "M";
+alfabeto[12][1] = "rgb(205,145,63)";
+alfabeto[12][2] = 77;
+
+
+alfabeto[13][0] = "N";
+alfabeto[13][1] = "rgb(12,75,100)";
+alfabeto[13][2] = 78;
+
+
+alfabeto[14][0] = "O";
+alfabeto[14][1] = "rgb(255,0,0)";
+alfabeto[14][2] = 79;
+
+alfabeto[15][0] = "P";
+alfabeto[15][1] = "rgb(175,155,50)";
+alfabeto[15][2] = 80;
+
+alfabeto[16][0] = "Q";
+alfabeto[16][1] = "rgb(185,185,185)";
+alfabeto[16][2] = 81;
+
+alfabeto[17][0] = "R";
+alfabeto[17][1] = "rgb(37,70,25)";
+alfabeto[17][2] = 82;
+
+alfabeto[18][0] = "S";
+alfabeto[18][1] = "rgb(121,33,135)";
+alfabeto[18][2] = 83;
+
+alfabeto[19][0] = "T";
+alfabeto[19][1] = "rgb(83,140,208)";
+alfabeto[19][2] = 84;
+
+alfabeto[20][0] = "U";
+alfabeto[20][1] = "rgb(0,154,37)";
+alfabeto[20][2] = 85;
+
+alfabeto[21][0] = "V";
+alfabeto[21][1] = "rgb(178,220,205)";
+alfabeto[21][2] = 86;
+
+alfabeto[22][0] = "W";
+alfabeto[22][1] = "rgb(169,34,0)";
+alfabeto[22][2] = 87;
+
+alfabeto[23][0] = "X";
+alfabeto[23][1] = "rgb(0,0,74)";
+alfabeto[23][2] = 88;
+
+alfabeto[24][0] = "Y";
+alfabeto[24][1] = "rgb(175,200,74)";
+alfabeto[24][2] = 89;
+
+alfabeto[25][0] = "Z";
+alfabeto[25][1] = "rgb(63,25,12)";
+alfabeto[25][2] = 90;
+
+
+alfabeto[26][0] = "0";
+alfabeto[26][1] = "rgb(0,0,180)";
+alfabeto[26][2] = 96;
+
+alfabeto[27][0] = "1";
+alfabeto[27][1] = "rgb(175,13,102)";
+alfabeto[27][2] = 97;
+
+alfabeto[28][0] = "2";
+alfabeto[28][1] = "rgb(146,248,70)";
+alfabeto[28][2] = 98;
+
+alfabeto[29][0] = "3";
+alfabeto[29][1] = "rgb(255,200,47)";
+alfabeto[29][2] = 99;
+
+alfabeto[30][0] = "4";
+alfabeto[30][1] = "rgb(255,118,0)";
+alfabeto[30][2] = 100;
+
+alfabeto[31][0] = "5";
+alfabeto[31][1] = "rgb(255,152,213)";
+alfabeto[31][2] = 101;
+
+alfabeto[32][0] = "6";
+alfabeto[32][1] = "rgb(235,235,222)";
+alfabeto[32][2] = 102;
+
+alfabeto[33][0] = "7";
+alfabeto[33][1] = "rgb(100,100,100)";
+alfabeto[33][2] = 103;
+
+alfabeto[34][0] = "8";
+alfabeto[34][1] = "rgb(255,255,0)";
+alfabeto[34][2] = 104;
+
+alfabeto[35][0] = "9";
+alfabeto[35][1] = "rgb(255,255,150)";
+alfabeto[35][2] = 105;
+
+
+$( document ).keypress(function(event) {
+
+   console.log(event.which)
+
+    if (event.which == 43){
+      bDificultad=!bDificultad;
+
+      return;
+
+    }
+
+     if (event.which == 45){
+      bPeque=!bPeque;
+      if(bPeque){
+        tam=5;
+      }else{
+        tam=800;
+
+      }
+      return;
+
+    }
+
+
+  if($("#eidetic").is(':checked')){
+    if (event.which == 32){
+      $("#screen").html(eideticText);
+
+      setTimeout(function(){
+        $("#screen").html("");
+
+      },eideticValue);
+
+    }
+  }
+  //alert(event.which);
+  if(modo==3){
+    s1=alfabeto[a][2];
+    s2=alfabeto[a][3];
+    s3=alfabeto[b][2];
+    s4=alfabeto[b][3];
+
+    console.log(pas1+"-"+pas2);
+
+
+    if ( (event.which == s1 || event.which == s2 ) && pas1 == 0 ) {
+      pas1=1;
+    
+      }
+      if ( (event.which == s3 || event.which == s4 ) && pas2 == 0 ) {
+      pas2=1;
+
+      }
+      if(pas1 == 1 && pas2==1){
+
+        t_fin = Date.now();
+        if(bModo14){
+          t_dif = t_fin - t_ini22;
+          // console.log("t_dif 14");
+
+        }else{
+          t_dif = t_fin - t_ini;
+
+        }
+        t_total += t_dif
+        t_promedio = Math.round(t_total/pasadas1);
+
+        //alfabeto[selectedModeCheck][4]++;
+      //alfabeto[selectedModeCheck][5] += t_dif ;
+      //alfabeto[selectedModeCheck][6] = alfabeto[selectedModeCheck][5]/alfabeto[selectedModeCheck][4];
+
+         play(0);
+         ok++;
+         $("#time").html(t_promedio);
+         $("#ok").html(ok);
+
+
+         return;
+      }
+
+      if(pas1)
+        return;
+      if(pas2)
+        return;
+      
+      error++;
+      $("#error").html(error);
+      return;
+    
+  }else{
+    if(modo==1){
+
+    selectedModeCheck = b;
+
+    }else{
+      selectedModeCheck = a;
+    } 
+
+    if(modo==4 || modo==11 || modo==5 || modo==12 || modo==15 ){
+      selectedModeCheck = a;
+
+    }
+
+
+    if ( event.which == alfabeto[selectedModeCheck][2] || event.which == alfabeto[selectedModeCheck][3] /*|| event.which == 32*/ ) {
+
+      errorCount=0;
+      posibility=n("posibility");
+      if(posibility>=15 && bDificultad){  
+        posibility-=5; 
+
+      }else{
+
+         if(posibility<=10 && posibility>=2 && bDificultad) posibility--;
+
+      }
+
+      if(bPeque){ if(tam>1) tam--; }
+
+      $("#posibility").val(posibility);
+
+        t_fin = Date.now();
+        if(bModo14){
+          t_dif = t_fin - t_ini22;
+          // console.log("t_dif 14");
+
+        }else{
+          t_dif = t_fin - t_ini;
+
+        }
+        
+        t_total += t_dif
+        t_promedio = Math.round(t_total/pasadas1);
+
+        if($("#bEliminator").is(':checked')) { 
+          if(t_dif<=n("eliminator-time")){
+            lilsta = [];
+            //console.log(selectedModeCheck);
+            $("#ch"+selectedModeCheck).prop('checked', false);
+            alfabeto[selectedModeCheck][7]=0;
+            z=0;
+            for (xx = 0; xx <= 25; xx++) {
+            if(alfabeto[xx][7]){
+              lista[z]=xx;
+              z++;
+            }
+          }
+          _count=0;
+            for (xx = 0; xx <= 25; xx++) {
+            if(alfabeto[xx][7]){
+              _count++;
+            }
+          }
+          if(_count<=2){
+            alert("Almost all letters eliminated (restarting...)");
+            function all(){
+              for(i=0;i<=25;i++){
+                $("#ch"+i).prop('checked', true);
+              }
+              actualiza();
+            }
+          }
+          }//t_dif < eliminator time
+      }//bEliminator
+
+      alfabeto[selectedModeCheck][4]++;
+      alfabeto[selectedModeCheck][5] += t_dif ;
+      alfabeto[selectedModeCheck][6] = alfabeto[selectedModeCheck][5]/alfabeto[selectedModeCheck][4];
+
+      if(t_dif>alfabeto[selectedModeCheck][9]) alfabeto[selectedModeCheck][9] = t_dif; 
+        if(t_dif<alfabeto[selectedModeCheck][10]) alfabeto[selectedModeCheck][10] = t_dif; 
+
+
+        if(bPiano){
+        snd=_color333.search(alfabeto[selectedModeCheck][0].toLowerCase())+48;
+         playNote(snd,1,60);
+         }
+         play(0);
+         ok++;
+         $("#time").html(t_promedio);
+         $("#ok").html(ok);
+
+         console.log(alfabeto[selectedModeCheck][0])
+
+    }else{
+
+      errorCount++;
+      posibility=n("posibility");
+      if(errorCount==1){ 
+          if(posibility!=100 && posibility>=10 && bDificultad){
+
+            posibility+=5;
+
+          }else{
+
+           if(posibility<=9 && posibility>=1 && bDificultad) posibility++;
+
+        } 
+        errorCount=0;
+      } 
+
+      if(bPeque){ tam++; } 
+
+      $("#posibility").val(posibility);
+
+      if(modo==12){
+        //$("#screen").click();
+      }
+
+        error++;
+        $("#error").html(error);
+
+
+        if(bDificultad || bNext || bPeque) play(0);
+    }
+  }
+
+   if (event.which == 32){
+
+
+     t_fin = Date.now();
+        if(bModo14){
+          t_dif = t_fin - t_ini22;
+          // console.log("t_dif 14");
+
+        }else{
+          t_dif = t_fin - t_ini;
+
+        }
+        
+        t_total += t_dif
+        t_promedio = Math.round(t_total/pasadas1);
+
+    alfabeto[selectedModeCheck][4]++;
+      alfabeto[selectedModeCheck][5] += t_dif ;
+      alfabeto[selectedModeCheck][6] = alfabeto[selectedModeCheck][5]/alfabeto[selectedModeCheck][4];
+
+       if(bPiano){
+        snd=_color333.search(alfabeto[selectedModeCheck][0].toLowerCase())+48;
+         playNote(snd,1,60);
+         }
+
+        play(0);
+         ok++;
+         $("#time").html(t_promedio);
+         $("#ok").html(ok);
+
+          return;
+   }
+
+  console.log(t_ini+ " , " +  t_dif  + "," + t_promedio + "," + t_total )
+
+  event.preventDefault()
+});
+
+function setFS(){
+
+
+
+        var elem = document.getElementById("m0");
+        if (elem.requestFullscreen) {
+          elem.requestFullscreen();
+        } else if (elem.mozRequestFullScreen) {
+          elem.mozRequestFullScreen();
+        } else if (elem.webkitRequestFullscreen) {
+          elem.webkitRequestFullscreen();
+        } else if (elem.msRequestFullscreen) { 
+          elem.msRequestFullscreen();
+        }
+}
+
+
+//lista
+tam_lista=12;
+
+ lista = [];
+  z=0;
+  for (xx = 0; xx <= 25; xx++) {
+      if(alfabeto[xx][7]){
+        lista[z]=xx;
+        z++;
+      }
+  }
+
+   lista=_.shuffle(lista);
+  lista=_.first(lista,tam_lista);
+  
+lista=[0,2,4,5,6,8,13,14,18];
+
+console.log(lista)
+
+
+
+function addElementToList(){
+
+  var aux=_.extend(lista);
+  var all= _.range(0,25);
+
+  var tam= aux.length;
+
+  if(tam==25) return;
+
+  for(;;){
+    aux=_.union(aux,all[_.random(0,all.length-1)]);
+    aux=_.uniq(aux);
+
+    if(aux.length==(tam+1)) break; 
+
+  }
+
+  lista=_.extend(aux);
+  console.log(lista)
+
+
+}
+
+
+
+function play(x){
+
+  if(bHelp){
+    createHelp();
+    $("#helpDiv").show();
+  }else{
+    $("#helpDiv").hide();
+  }
+
+  pas1=0;
+  pas2=0;
+  //lista = [];
+  z=0;
+
+  /*
+  for (xx = 0; xx <= 25; xx++) {
+      if(alfabeto[xx][7]){
+        lista[z]=xx;
+        z++;
+      }
+  }
+*/
+ 
+ /*
+
+  if(modo==9 || modo==11 || modo==18){
+    z=0;
+    lista = [];
+    for (xx = 26; xx <= 35; xx++) {
+      
+          lista[z]=xx;
+          z++;
+      
+    }
+
+  }*/
+  aceleration=n("aceleration");
+  increment=n("increment");
+/*
+  lista=_.shuffle(lista);
+  lista=_.first(lista,tam_lista);
+  console.log(lista)
+  */
+
+
+  if(x>0){
+    tricky=n("tricky")
+    cantidadPasadas = 0;
+    lista = [];
+    a = -1;
+    b = -1;
+    ok=0;
+    error=0;
+    pasadas1 = 0;
+    t_total = 0;
+    t_promedio = 0;
+    $("#time").html(t_promedio);
+    $("#cantidad-pasadas").html(cantidadPasadas);
+        $("#ok").html(ok);
+        $("#error").html(error);
+        $("#screen").html("");
+        z=0;
+    for (xx = 0; xx <= 35; xx++){
+      alfabeto[xx][4] = 0;
+      alfabeto[xx][5] = 0;
+      alfabeto[xx][6] = 0;
+      alfabeto[xx][9] = 0; //max
+        alfabeto[xx][10] = 10000; //min
+      
+    }
+
+    /*
+    for (xx = 0; xx <= 25; xx++) {
+      if(alfabeto[xx][7]){
+        lista[z]=xx;
+        z++;
+      }
+    }
+    if(modo==9 || modo==11 || modo==18){
+      z=0;
+      lista = [];
+      for (xx = 26; xx <= 35; xx++) {
+        
+            lista[z]=xx;
+            z++;
+        
+      }
+
+    }
+
+    lista=_.shuffle(lista);
+    lista=_.first(lista,tam_lista);
+    console.log(lista)*/
+
+  }//x>2
+
+
+ // if(cantidadPasadas%20==0 && cantidadPasadas!=0) addElementToList();
+
+
+  if(x==2){
+    return;
+  }
+
+  if(modo==14){
+    bModo14=1;
+    modo=4;
+    estadoModo14=0;
+  }
+
+  ant_b = b;
+  ant_a = a;
+
+  if(estadoModo14>0){
+    poner123=ant_a;
+    // console.log(ant_a);
+
+  }
+
+  p=0;
+  
+  do{
+    __count=0;
+    for(;;){
+      if(bBasicEmo && modo==4){
+        matrixEmo = [0,4,13,14,17,18] //a e ,"n","o","r","s"];
+        a = matrixEmo[aleatorio(0,matrixEmo.length-1)];
+        b = matrixEmo[aleatorio(0,matrixEmo.length-1)];
+
+        console.log("emo")
+        
+              //a0b1c2d3e4f5g6h7i8j9k10l11m12n13ñ14o15p16q17r18s19t20u21v22w23x24y25z26
+      }else{
+
+        
+        a = lista[aleatorio(0,lista.length-1)];
+        b = lista[aleatorio(0,lista.length-1)];
+
+        console.log(a+"-"+b);
+
+      }
+
+       if(aleatorio(1,100)<=tricky && pasadas1>=2){
+        // _max=-1;
+        // _currentMax=-1;
+
+
+        // for (_xx = 0; _xx <= 35; _xx++) {
+
+        //   if(Math.round(alfabeto[_xx][6])>_max){
+        //     _max=Math.round(alfabeto[_xx][6]);
+        //     _currentMax=_xx;
+        //   }
+
+        // }
+
+        // a=_currentMax;
+        // for(;;){
+        //   a=_.random(0,2)
+        //   a=0;
+        //   if(isLetter( alfabeto[a][0]) && a!=ant_a ){ break; }  
+        // }
+        //  _arr = alfabeto.slice()
+
+        // console.log(alfabeto);
+        // _arr = _arr.sort(function(__a,__b) {
+        //   return __b[6] - __a[6];
+        // });
+
+        // console.log(alfabeto)
+        
+        //b=_currentMax;
+        //a=alfabeto[_currentMax][0];
+        
+        // console.log(a+" "+alfabeto[_currentMax][0])
+
+
+        //console.log(alfabeto);
+
+        // for(;;){ 
+        //   a=_.random(0,2); 
+        //   console.log(a)
+        //   if(isLetter( alfabeto[a][0]) && a!=ant_a ){ break; } 
+        // }
+
+        // console.log(_arr);
+
+        // _s2=0;
+        // bBreak=0;
+        // for(;;){
+        //   _s=_arr[_.random(0,0)][0];
+
+        //   bBreak=0;
+
+        //   for(_i=0;_i<alfabeto.length;_i++){
+            
+        //     if(_s==alfabeto[_i][0]){ _s2=_i; bBreak=1; break; }
+        //   }
+
+        //   if(alfabeto[_i][6]>=0 && bBreak) break;
+        // }
+
+        // a=_s2;
+        // //console.log(_s2)
+        // console.log(alfabeto)
+        // console.log(_s2+ " " + a  +" "+alfabeto[_s2][0] )
+
+        _arr = alfabeto.slice()
+
+        // console.log(alfabeto);
+        _arr = _arr.sort(function(__a,__b) {
+          return __b[6] - __a[6];
+        });
+
+        _myRnd=_.random(0,2)
+        a=_arr[_.random(_myRnd)][20];
+
+        console.log("tricky")
+        console.log(_arr[_myRnd][0])
+        console.log(_arr)
+        
+
+      }
+      
+      
+      p++;
+
+      if (p==10) break;
+
+      __count++;
+
+      if(modo==4){
+
+        if(__count==4)
+          break;
+
+        _l=a.toLowerCase;
+        if(_l=="a" || _l=="e" || _l== "n" || _l== "o" || _l== "r" || _l== "s" )
+          break;
+
+      }else{
+
+        break;
+      }
+
+
+    }//for(;;)
+    
+  }while(b == ant_b || a==ant_a || a==b);
+
+  //console.log(a)
+
+  if(modo==10){
+    a = b;
+
+  }
+
+  //console.log(a + "-" + b);
+
+  posibles = [1,4,5]
+  if(randomSystem){
+    modo = posibles[aleatorio(0,2)];
+  }
+
+  transform="";
+  if(myTransformation==2){
+    if(aleatorio(0,1))
+      transform="transform:rotateZ(180deg);"
+    else
+      transform="";
+  }
+  if(myTransformation==3){
+    
+    transform="transform:skewY("+aleatorio(-40,40)+"deg);"
+          
+  }
+
+  if(myTransformation==4){
+    transform="transform:";
+    if(aleatorio(0,1))
+      transform+="rotateZ(180deg)"
+    else
+      transform+="";
+
+    transform+=" skewY("+aleatorio(-40,40)+"deg);"
+
+
+  }
+  if(estadoModo14>0){
+    a=poner123;
+    b=poner123;
+    // console.log(a);
+  }
+  
+
+  if(modo==4 || modo==11 || modo==13 || modo==17 || modo==18){
+    if(modo==11 || modo==18 ){
+      console.log(alfabeto[a][0]);
+      letra = alfabeto[a][0];
+      if(modo==11){
+        letra = alfabeto[a-26][0];
+        letra = letra.toLowerCase();
+        console.log(letra); 
+      }
+
+       letra11="";
+
+     
+
+    }else{
+      
+      letra = alfabeto[a][0];
+      letra = letra.toLowerCase();
+      
+
+      letra11 = alfabeto[b][0];
+      letra11 = letra11.toLowerCase();
+    }
+    
+    
+
+    ext = "gif", al="";
+    ext11 = "gif", al11="";
+
+
+    //modo 4
+    if (letra == "á" || letra =="a"){
+        letra = "a";
+        al = aleatorio(1,4);
+    }
+    if (letra == "é" || letra =="e"){
+      letra = "e";
+      al = aleatorio(1,4);
+    }
+    if (letra == "í"){
+      letra = "i";
+    
+    }
+    if (letra == "ó" || letra =="o"){
+      letra = "o";
+      al = aleatorio(1,4);
+    }
+    if (letra == "ú"){
+      letra = "u";
+      
+    }
+    if (letra == "ñ"){
+      letra = "nn";
+      ext = "png";
+    }
+    if (letra == "s" || letra == "r" || letra == "n"){
+      
+      al = aleatorio(1,4);
+    }
+    if (letra == "j" || letra == "k" || letra == "w" || letra == "x" || letra == "z"){
+      
+      ext = "png";
+    }
+
+    //modo 13   
+    if (letra11 == "á" || letra11 =="a"){
+        letra11 = "a";
+        al11 = aleatorio(1,4);
+    }
+    if (letra11 == "é" || letra11 =="e"){
+      letra11 = "e";
+      al11 = aleatorio(1,4);
+    }
+    if (letra11 == "í"){
+      letra11 = "i";
+    
+    }
+    if (letra11 == "ó" || letra11 =="o"){
+      letra11 = "o";
+      al11 = aleatorio(1,4);
+    }
+    if (letra11 == "ú"){
+      letra11 = "u";
+      
+    }
+    if (letra11 == "ñ"){
+      letra11 = "nn";
+      ext11 = "png";
+    }
+    if (letra11 == "s" || letra11 == "r" || letra11 == "n"){
+      
+      al11 = aleatorio(1,4);
+    }
+    if (letra11 == "j" || letra11 == "k" || letra11 == "w" || letra11 == "x" || letra11 == "z"){
+      
+      ext11 = "png";
+    }
+
+    tamanoWidth = 140;
+    tamanoHeight = 180;
+
+    //poner = "<br><br><br><div style=\"background-color:" + alfabeto[a][1] + ";\"><img src=\"/emociones/" + letra + al + "." + ext + "\" width=\"" + tamanoWidth + "\" height=\"" + tamanoHeight + "\" style=\"opacity:0.5;\"></div>";
+    if($(window).width()>1000){
+      //ll["espacio"].play();
+      // ll[letra].play();
+  
+    }
+    
+
+    if(modo==4 || modo==11){
+      poner = "<br><br><br><img src=\"/emociones/" + letra + al + "." + ext + "\" width=\"" + tamanoWidth + "\" height=\"" + tamanoHeight + "\" style=\""+transform+"\" id=\"myImg\">";
+
+      // console.log( letra + al + "." + ext );
+
+    }else{
+
+      if(modo==18){
+        al=""; ext="png"
+          poner = "<br><br><br><img src=\"/face/" + letra + al + "." + ext + "\" width=\"" + tamanoWidth + "\" height=\"" + tamanoHeight + "\" style=\""+transform+"\" id=\"myImg\">";
+
+      }else{
+         poner = "<br><br><br>" + 
+      "<center><div style=\"width:50%;\"><div style=\"float:left;\"><img src=\"/emociones/" + letra + al + "." + ext + "\" width=\"" + tamanoWidth + "\" height=\"" + tamanoHeight + "\" style=\""+transform+"\"></div><div style=\"width: " + $("#width-space").val() + "px; float:left;\">&nbsp;</div><div style=\"float:left;\"><img src=\"/emociones/" + letra11 + al11 + "." + ext11 + "\" width=\"" + tamanoWidth + "\" height=\"" + tamanoHeight + "\" style=\""+transform+"\"></div></div></center>";
+
+      }
+
+     
+    }
+    
+
+  }else if(modo==5 || modo==6 || modo==19){
+    letra = alfabeto[a][0];
+    letra = letra.toLowerCase();
+    al = "";
+
+    ext = "png";
+    
+
+    if (letra == "á" || letra =="a"){
+      letra = "a";
+      //al = aleatorio(1,4);
+    }
+    if (letra == "é" || letra =="e"){
+      letra = "e";
+      //al = aleatorio(1,4);
+    }
+    if (letra == "í"){
+      letra = "i";
+    
+    }
+    if (letra == "ó" || letra =="o"){
+      letra = "o";
+      //al = aleatorio(1,4);
+    }
+    if (letra == "ú"){
+      letra = "u";
+      
+    }
+    if (letra == "ñ"){
+      letra = "nn";
+      //ext = "png";
+    }
+    if (letra == "s" || letra == "r" || letra == "n"){
+      
+      //al = aleatorio(1,4);
+    }
+
+    if (letra == "j" || letra == "k" || letra == "w" || letra == "x" || letra == "z"){
+      
+      //ext = "png";
+    }
+
+    carpeta = "/emociones2/";
+    tamanoWidth = 140;
+    tamanoHeight = 180;
+    if(modo==6){
+      carpeta = "/sordomudos/";
+      tamanoWidth = 45;
+      tamanoHeight = 45;
+    }
+
+   if(modo==19){
+    carpeta=""; al=""; ext="";
+
+      console.log(letra)
+
+      poner = "<br><br><br><img src=\"" + letraCara[letra] + al + "" + ext + "\" width=\"" + tamanoWidth + "\" height=\"" + tamanoHeight + "\" id=\"myImg\" >";
+    }else{
+        poner = "<br><br><br><img src=\"" + carpeta + letra + al + "." + ext + "\" width=\"" + tamanoWidth + "\" height=\"" + tamanoHeight + "\" id=\"myImg\" >";
+
+    }
+
+  
+
+  }else{
+    if(black){
+
+      
+      poner = "<center><div style=\"width:500px; "+transform+"\"><span style=\"color: black; font-size: 600px; "+transform+"\"><b>" + alfabeto[a][0] + "</b></span></div></center>";
+
+    }else{
+      if(modo==12 || modo==15 ){
+
+        //div mode  
+
+           if(n("posibility")==100){
+              
+              poner = "<div style=\"background-color: " + alfabeto[a][1] + "; width: "+tam+"px; height: "+tam+"px; "+transform+"\">&nbsp;</div>";
+
+            }else{
+
+              poner=``;
+
+
+            }
+
+        
+
+       
+        
+      }else{
+        //two color
+        /*
+        if(aleatorio(0,1))
+          alfabeto[a][0] = "I";*/
+       
+       // poner = "<center><div style=\"width:500px; "+transform+"\"><span style=\"color: " + alfabeto[b][1] + "; font-size: 550px; "+transform+"\"><b>" + alfabeto[a][0] + "</b></span></div></center>";
+
+         $("#m0").removeClass(prevClass);
+
+         //indexClass=_.random(0,_color.length-1);
+
+         // letter=_color.charAt(indexClass);
+
+        currentClass="profile-pic-"+alfabeto[b][0].toLowerCase();
+
+        console.log(currentClass)
+
+        prevClass=currentClass;
+
+        $("#m0").addClass(currentClass);
+
+      }
+      
+    }
+  }
+
+  if(modo==16){
+
+     myRandom=_.random(0,1);
+     _class="circle";
+
+     if(myRandom){
+
+       poner = "<center><div class=\""+_class+"\" style=\"/*width:500px; "+transform+"*/\"><p><span style=\"color: " + alfabeto[a][1] + "; font-size: 75px; "+transform+"\"><b>" + alfabeto[b][0] + "</b></span></p></div></center>";
+      
+
+     }else{
+      _class="up";
+
+      poner = "<br><br><center><div class=\""+_class+"\" style=\"/*width:500px; "+transform+"*/\"><p><span style=\"color: " + alfabeto[b][1] + "; font-size: 75px; "+transform+"\"><b>" + alfabeto[a][0] + "</b></span></p></div></center>";
+
+     
+
+     } 
+
+     
+
+     //if(myRandom) _c=a; a=b; b=_c;
+     
+     
+
+  }
+
+  if(modo == 13){
+    $("#helpDiv").hide();
+
+
+  }else{
+    if($("#help").is(':checked')) {  
+      //  $("#helpDiv").show();
+    }else{
+       //  $("#helpDiv").hide();
+
+    }
+
+
+  }
+
+  cantidadPasadas++;
+  //$("#screen").html(poner);
+
+  if(modo==17){
+      ll["espacio"].play();
+       ll[letra].play();
+        $("#screen").html("");
+        console.log(letra)
+     
+  }
+
+  if(modo==12 && n("posibility")!=100){
+    $("#screen2").show();
+
+    posi=n("posibility");
+
+     if(posi==1000) posi=_.random(5,20);
+
+      console.log(posi)
+    
+     for(i=0;i<tamanoCanvas;i++){
+        for(j=0;j<tamanoCanvas;j++){
+
+          r=_.random(0,100);
+
+
+
+          if(r<=posi){
+            
+            __color=alfabeto[a][1];
+
+          }else{
+            r=_.random(0,255); g=_.random(0,255); b=_.random(0,255);
+
+            __color= "rgb("+r+","+g+","+b+")";
+          }
+
+          ctx.fillStyle = __color;
+          ctx.fillRect( i, j, 1, 1);
+
+        }
+      }
+
+      console.log(alfabeto[a][0]);
+
+       if($("#eidetic").is(':checked')){
+
+         setTimeout(function(){
+          ctx.fillStyle = "white";
+          ctx.fillRect(0, 0, c.width, c.height);
+
+        },eideticValue);
+
+
+       }
+  }
+
+  if(modo==15){
+    $("#screen2").show();
+
+    clearInterval(killRefreshCanvas);
+    
+    killRefreshCanvas = setInterval(function(){
+
+      for(i=0;i<tamanoCanvas;i++){
+        for(j=0;j<tamanoCanvas;j++){
+
+          r=_.random(0,100);
+
+          if(r<=n("posibility")){
+            
+            __color=alfabeto[a][1];
+
+          }else{
+            //r=_.random(0,255); g=_.random(0,255); b=_.random(0,255);
+
+           // __color= "rgb("+r+","+g+","+b+")";
+           for(;;){ __color=alfabeto[_.random(0,25)][1];  if(__color!=alfabeto[a][1]){ break; } }
+           
+          }
+
+          ctx.fillStyle = __color;
+          ctx.fillRect( i, j, 1, 1);
+
+        }
+      }
+    },1);
+     
+     
+      console.log(alfabeto[a][0]);
+  }
+
+  if(modo!=12 && modo!=15){
+    $("#screen2").hide();
+  }
+  
+
+  if(bHide){
+
+    __h=$("#screen").height();
+    __w=$("#screen").width();
+
+    $("#screen").css("position","relative");
+
+
+    if(_.random(0,1)){
+      __top=__h*(2/3);
+      __tH=__h*(1.5/3);
+    }else{
+      __top=0;
+      __tH=__h*(2/3);
+
+    }
+    ww=$(window).width();
+    if(bMover)
+      pW=_.random(0,ww-150);
+    else
+      pW=(ww-100)/2;
+
+    $("#myImg").css("position","absolute");
+    $("#myImg").css("left",pW+"px");
+    $("#myImg").css("z-index","1000");
+
+    $("#screen").prepend(`
+      <div style="background-color: white; position: absolute; display: inline-block; left:0px; top:${__top}px; height:${__tH}px !important; width:${__w}px; z-index:2000;" id="tapar">
+      &nbsp;
+      </div>
+    `);
+    
+    
+    //$("#tapar").height(__h);
+  }
+
+  $("#cantidad-pasadas").html(cantidadPasadas);
+
+  if(bPiano && bAuto){
+    selectedModeCheck=b;
+    snd=_color333.search(alfabeto[selectedModeCheck][0].toLowerCase())+48;
+    playNote(snd,1,36);
+  }
+
+
+  if($("#eidetic").is(':checked')) {  
+
+    eideticValue = parseInt($("#eidetic-value").val());
+    eideticText = $("#screen").html();
+
+    setTimeout(function(){
+      $("#screen").html("");
+
+    },eideticValue);
+        
+
+  }
+
+  t_ini = Date.now();
+
+
+  pasadas1++;
+
+  if(modo==14){
+    console.log("modo 14");
+  }
+
+  if(aceleration!=0 && $("#autoplay").is(':checked')){
+    if(pasadas1%aceleration==0){
+      $("#velocity").val( n("velocity") - increment  );
+    }
+  }
+
+  if ($("#autoplay").is(':checked') ){
+    kill=setTimeout(play,parseInt($("#velocity").val()));
+
+  }
+
+  if(bAuto){
+
+    setTimeout(function(){
+      selectedModeCheck=a;
+       t_fin = Date.now();
+        
+        if(bModo14){
+          t_dif = t_fin - t_ini22;
+          // console.log("t_dif 14");
+
+        }else{
+          t_dif = t_fin - t_ini;
+
+        }
+        
+        t_total += t_dif
+        t_promedio = Math.round(t_total/pasadas1);
+
+    alfabeto[selectedModeCheck][4]++;
+      alfabeto[selectedModeCheck][5] += t_dif ;
+      alfabeto[selectedModeCheck][6] = alfabeto[selectedModeCheck][5]/alfabeto[selectedModeCheck][4];
+
+
+        play(0);
+         ok++;
+         $("#time").html(t_promedio);
+         $("#ok").html(ok);
+
+    },autoValue)
+  }
+
+    // console.log(estadoModo14);
+
+  if(bModo14){
+    if(estadoModo14==0){
+      t_ini22 =  Date.now();
+      console.log("set t_ini");
+    }
+
+    estadoModo14++;
+    if(estadoModo14==1){
+      setTimeout(function(){
+        modo=12;
+        play(0);
+
+      },200);
+
+    }
+    if(estadoModo14==2){
+      setTimeout(function(){
+        modo=7;
+        black=1;
+        play(0);
+
+        black=0;
+
+        modo=14;
+        estadoModo14=0;
+
+      },200);
+
+    }
+    
+  }
+
+}
+
+function aleatorio(a,b){
+  return Math.round(Math.random()*(b-a)+parseInt(a));
+}
+
+
+black = 0;
+randomSystem = 0;
+
+
+bDificultad=0;
+
+bNext=0;
+
+var eidetic = 0;
+var eideticValue = 0;
+var eideticText = "";
+
+var a=-1,b=-1;
+var ok = 0;
+var error = 0;
+var pasadas1 = 0;
+var   t_ini = 0
+  t_fin = 0
+  t_dif = 0
+  t_total = 0
+  t_promedio = 0;
+
+var t_ini22=0;
+
+
+var a,b,ant_a,ant_b,poner123;
+var cantidadPasadas = 0;
+
+errorCount=0;
+
+bHide=0;
+myTransformation=1;
+bHelp=0; 
+var a,ant_a,ant_b,ant_pasada;
+estadoModo14=0;
+bPonerPrev=0;
+bModo14=0;
+bPeque=0;
+tam=800;
+
+vTable = 0;
+
+
+function startRandomObjetive(){
+
+  $("#random-pos").remove();
+
+  if(eye){
+
+    // el=$("#img-div>img").first();
+    el=$("#m0").first();
+
+    _w=el.width();
+    _h=el.height();
+
+
+    position = el.position();
+
+    _x=position.left;
+    _y=position.top;
+
+    //console.log(_x + " " + _y);
+    //console.log(_w + "x" + _h);
+
+    relativeY=_.random(_y,_y+_h);
+    relativeX=_.random(_x,_x+_w);
+
+    if(posArray.length==2){
+
+
+      relativeX=_.random(posArray[0][0],posArray[1][0]);
+      relativeY=_.random(posArray[0][1],posArray[1][1]);
+
+      //console.log("load from index array")
+    }
+
+
+
+    $("body").append(`
+    <div id="random-pos" style="position: fixed; top: ${relativeY}px; left: ${relativeX}px; color: green; font-size: 50px; z-index: 9999;">+</div>
+    `);
+
+
+  }else{
+    $("#random-pos").remove();
+  }
+
+  setTimeout(function(){startRandomObjetive(); },n("color-change"));
+}
+
+
+
+optflpit=1;
+noflip=1;
+setInterval(function(){ optflpit=!optflpit;  p=""; if(optflpit) p="-"; if(noflip) p="";
+    $("#m0").css("transform", "scaleY("+p+"1)");  },25);
+
+/*
+setInterval(function(){  
+  
+  var ww=$(window).width();
+  var wh=$(window).height();
+
+  var zval=2/_.random(1,20); 
+
+  $(".anim").css("zoom", zval);  
+
+ 
+
+
+
+},50);*/
+
+newTime=_.random(0,100*60); $('#start-time').val(newTime);
+
+//timer
+// setTimeout(function(){  alert("time"); },5*60*1000);
+
+
+setInterval(function(){
+
+  if(!bPartMovie) return;
+
+   iw=$("#m0").width(); ih=$("#m0").height(); //console.log(iw+ " " + ih );
+  $("#m0").css("-webkit-clip-path",`circle(90px at ${_.random(100,iw-100)}px ${_.random(300,ih-300)}px)`);
+  //$(".myFlip").show();
+
+},1);
+
+//play();
+
+//addColor();
+
+window.onload = function () {
+  MIDI.loadPlugin({
+    soundfontUrl: "./soundfont/",
+    instrument: "acoustic_grand_piano",
+    onprogress: function(state, progress) {
+      console.log(state, progress);
+    },
+    onsuccess: function() {
+      var delay = 0; // play one note every quarter second
+      var note = 49; // the MIDI note
+      var velocity = 127; // how hard the note hits
+      // play the note
+      MIDI.setVolume(0, 127);
+      MIDI.noteOn(0, note, velocity, delay);
+      MIDI.noteOff(0, note, delay + 0.75);
+    }
+  });
+};
+
+
+function playNote(note,off,velocity=127){
+  console.log(velocity)
+
+  //off=0;
+
+  //panToRight();
+
+   var delay = 0; // play one note every quarter second
+     // var note = 51; // the MIDI note
+      //var velocity = 127; // how hard the note hits
+      // play the note
+      MIDI.setVolume(0, 127);
+      MIDI.noteOn(0, note, velocity, delay);
+      MIDI.noteOff(0, note, delay + (off/1000));
+}
+
+firstNote={"c":48}
+var autoValue;
+setTimeout(function(){
+   bPiano=0;
+   autoValue=500;
+
+
+  $("#start-time").val("293");
+  $("#img-select").val("movies/[TorrentCouch.net].Elite.S01E06.HDTV.x264.mp4");
+},1000)
+ 
+
+</script>
+<script src="js/midi/soundfont.js" type="text/javascript"></script>
+<script src="js/controller.js"></script>
+
+</body>
+</html>
